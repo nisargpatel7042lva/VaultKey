@@ -1,0 +1,55 @@
+---
+description: VaultKey project bible (StableHacks 2026) — scope, architecture, rules
+alwaysApply: true
+---
+
+# VaultKey — Project Bible (Condensed)
+
+## What we’re building
+- **VaultKey**: institutional **permissioned** DeFi yield vault on **Solana devnet**
+- **Core differentiator**: **Token-2022 Transfer Hook** enforces KYC *in the runtime* (no frontend bypass)
+- **Audience**: regulated institutions (primary: AMINA Bank / hackathon track)
+
+## MVP scope (ship vs mock vs cut)
+- **Ship on-chain**: KYC credential PDA; transfer hook; vault deposit/withdraw; KYT + Travel Rule events; AML revoke blocks transfers; investor UI + admin dashboard
+- **Mock clearly**: yield accrual via `harvest_yield` (hardcoded); KYT scoring thresholds; Travel Rule endpoint is local Express that ACKs; manual admin KYC issuance
+- **Cut**: real Kamino/MarginFi CPI, real KYT/KYC providers, Fireblocks, multi-tranche, mobile-first, mainnet
+
+## Tech stack + pinned versions (do not deviate)
+- **Anchor** `0.30.x`, **@coral-xyz/anchor** `0.30.x`
+- **@solana/web3.js** `1.95.x`
+- **@solana/spl-token** `0.4.x` (Token Extensions)
+- **Next.js** `14.x`, **Tailwind** `3.x`, **pnpm**
+
+## On-chain architecture (3 Anchor programs)
+### `kyc_registry`
+- Issues/revokes `KycCredential` PDA
+- Seeds: `["kyc", wallet.key().as_ref()]`
+- Fields: `wallet, tier, issued_at, expiry, aml_cleared, bump`
+- Errors: `NotAdmin`, `AlreadyIssued`, `CredentialNotFound`
+
+### `transfer_hook`
+- Enforces KYC checks on **every vkUSDC transfer**
+- Checks recipient credential: exists, not expired, `aml_cleared == true`
+- **Critical**: `initialize_extra_account_meta_list` must include recipient credential PDA derived using the **`kyc_registry` program id**
+- Errors: `NotKyced`, `CredentialExpired`, `AmlFlagged`
+
+### `vault`
+- `initialize_vault`, `deposit_usdc`, `withdraw_usdc`, `harvest_yield` (mock), `update_vault_config`
+- Emits `KytEvent` on every deposit/withdraw; emits `TravelRuleEvent` on withdraw > 3000 USDC (6 decimals)
+- Errors include `NotKyced`, `CredentialExpired`, `AmlFlagged`, `NotAdmin`, etc.
+
+## Frontend + backend expectations
+- **Design**: institutional fintech; data-dense; minimal animations; status badges (VERIFIED/PENDING/BLOCKED/EXPIRED)
+- Backend listens to program logs; mock KYT scorer; posts Travel Rule events to local mock VASP server.
+
+## Demo moments (optimize for these)
+- **Scene 1**: transfer hook blocks non-KYC recipient on-chain
+- **Scene 2**: deposit emits KYT event; admin feed shows risk tier
+- **Scene 3**: >$3k withdraw triggers Travel Rule event + mock ACK
+
+## Rules for every Cursor chat
+- **No scope creep** beyond MVP scope above; mocks must be labeled; no real external APIs.
+- **Only modify files for the current chat bucket** (A1/A2/A3/B/C/D/E as defined in the Project Bible). If the user hasn’t specified which bucket, **ask which one** before editing.
+- **Before edits**: read the file(s) you’ll edit; **show current state** of the file being edited at the start of the session.
+- **After finishing**: state what test/verification confirms it works.

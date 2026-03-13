@@ -1,0 +1,46 @@
+### Node / TypeScript / pnpm
+node_modules/
+.pnpm-store*/
+pnpm-lock.yaml
+dist/
+build/
+coverage/
+.turbo/
+
+### Next.js (frontend, if present)
+.next/
+out/
+
+### Environment / secrets
+.env
+.env.*
+!.env.example
+
+### Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+### Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+### Rust / Anchor / Solana
+target/
+**/target/
+.anchor/
+**/.anchor/
+*.so
+*.dylib
+*.dll
+
+### Misc
+*.tsbuildinfo
+*.tmp
+*.bak
+*.orig

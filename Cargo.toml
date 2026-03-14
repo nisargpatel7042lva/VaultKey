@@ -1,6 +1,8 @@
 [workspace]
 members = [
   "programs/kyc_registry",
+  "programs/transfer_hook",
+  "programs/vault",
 ]
 resolver = "2"
 

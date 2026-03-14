@@ -1,7 +1,7 @@
 [package]
-name = "transfer_hook"
+name = "vault"
 version = "0.1.0"
-description = "VaultKey transfer hook program enforcing KYC checks at the token layer"
+description = "VaultKey main vault program (vkUSDC yield vault with KYT + Travel Rule)"
 edition = "2021"
 
 [lib]
@@ -14,5 +14,5 @@ default = []
 
 [dependencies]
 anchor-lang = "0.32.1"
-anchor-spl = { version = "0.32.1", features = ["token_2022"] }
+anchor-spl = { version = "0.32.1", features = ["token", "token_2022"] }
 

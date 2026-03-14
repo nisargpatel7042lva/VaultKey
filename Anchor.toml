@@ -1,5 +1,5 @@
 [toolchain]
-anchor_version = "0.30.1"
+anchor_version = "0.32.1"
 
 [features]
 seeds = false
@@ -7,6 +7,7 @@ skip-lint = false
 
 [programs.localnet]
 kyc_registry = "11111111111111111111111111111111"
+transfer_hook = "11111111111111111111111111111111"
 
 [registry]
 url = "https://api.apr.dev"
@@ -18,5 +19,7 @@ wallet = "~/.config/solana/id.json"
 [workspace]
 members = [
   "programs/kyc_registry",
+  "programs/transfer_hook",
+  "programs/vault",
 ]
 

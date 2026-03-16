@@ -3,8 +3,9 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "types": ["mocha", "node"]
+    "types": ["node"],
+    "esModuleInterop": true
   },
-  "include": ["tests/**/*.ts", "scripts/**/*.ts", "backend/**/*.ts"]
+  "include": ["backend/**/*.ts"]
 }
 

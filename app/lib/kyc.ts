@@ -1,8 +1,6 @@
 "use client";
 
-import type { AnchorProvider, Idl } from "@coral-xyz/anchor";
-import { Program, BN } from "@coral-xyz/anchor";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import { KYC_REGISTRY_PROGRAM_ID } from "./anchor";
 
 // These types mirror the on-chain account fields; kept minimal for UI use.
@@ -23,24 +21,40 @@ export function deriveCredentialPDA(
   );
 }
 
+function readI64LE(buf: Buffer, offset: number): number {
+  // Anchor uses i64 little-endian.
+  // JS can't safely represent full i64 range; our timestamps fit in i53.
+  const lo = buf.readUInt32LE(offset);
+  const hi = buf.readInt32LE(offset + 4);
+  return hi * 2 ** 32 + lo;
+}
+
 export async function fetchCredential(
-  program: Program<Idl>,
+  connection: Connection,
   wallet: PublicKey,
 ): Promise<KycCredential | null> {
   const [pda] = deriveCredentialPDA(wallet);
-  try {
-    // @ts-expect-error dynamic IDL typing
-    const account = await program.account.kycCredential.fetch(pda);
-    return {
-      wallet: account.wallet.toBase58(),
-      tier: account.tier,
-      issuedAt: (account.issuedAt as BN).toNumber(),
-      expiry: (account.expiry as BN).toNumber(),
-      amlCleared: account.amlCleared,
-    };
-  } catch {
-    return null;
-  }
+  const info = await connection.getAccountInfo(pda, "confirmed");
+  if (!info?.data) return null;
+
+  const data = Buffer.from(info.data);
+  // Layout (Anchor):
+  // [0..8) discriminator
+  // [8..40) wallet pubkey
+  // [40] tier u8
+  // [41..49) issued_at i64
+  // [49..57) expiry i64
+  // [57] aml_cleared bool
+  // [58] bump u8
+  if (data.length < 59) return null;
+
+  const walletPk = new PublicKey(data.subarray(8, 40)).toBase58();
+  const tier = data.readUInt8(40);
+  const issuedAt = readI64LE(data, 41);
+  const expiry = readI64LE(data, 49);
+  const amlCleared = data.readUInt8(57) === 1;
+
+  return { wallet: walletPk, tier, issuedAt, expiry, amlCleared };
 }
 
 export function isKycValid(cred: KycCredential | null): {

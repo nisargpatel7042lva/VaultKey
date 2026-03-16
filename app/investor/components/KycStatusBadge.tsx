@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { fetchCredential, isKycValid, KycCredential } from "../../lib/kyc";
-import { getProvider } from "../../lib/anchor";
-import { Program, Idl } from "@coral-xyz/anchor";
+import { fetchCredential, isKycValid } from "../../lib/kyc";
+import { getConnection } from "../../lib/anchor";
 
 type Status = "unknown" | "verified" | "blocked" | "expired";
 
-export function KycStatusBadge({ program }: { program: Program<Idl> }) {
+export function KycStatusBadge() {
   const { publicKey } = useWallet();
   const [status, setStatus] = useState<Status>("unknown");
   const [reason, setReason] = useState<string | undefined>(undefined);
@@ -21,7 +20,8 @@ export function KycStatusBadge({ program }: { program: Program<Idl> }) {
     }
 
     (async () => {
-      const cred = await fetchCredential(program, publicKey);
+      const connection = getConnection();
+      const cred = await fetchCredential(connection, publicKey);
       const res = isKycValid(cred);
       if (!cred) {
         setStatus("blocked");
@@ -34,7 +34,7 @@ export function KycStatusBadge({ program }: { program: Program<Idl> }) {
         setReason(undefined);
       }
     })();
-  }, [publicKey, program]);
+  }, [publicKey]);
 
   const label =
     status === "verified"

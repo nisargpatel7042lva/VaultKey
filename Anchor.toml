@@ -8,6 +8,7 @@ skip-lint = false
 [programs.localnet]
 kyc_registry = "11111111111111111111111111111111"
 transfer_hook = "11111111111111111111111111111111"
+vault = "11111111111111111111111111111111"
 
 [registry]
 url = "https://api.apr.dev"

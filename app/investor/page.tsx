@@ -1,8 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { WalletProvider } from "@solana/wallet-adapter-react";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
+import { WalletConnectButton } from "./components/WalletConnectButton";
+import { VaultStats } from "./components/VaultStats";
+import { DepositForm } from "./components/DepositForm";
+import { WithdrawForm } from "./components/WithdrawForm";
+import { TransactionHistory } from "./components/TransactionHistory";
 import { KycStatusBadge } from "./components/KycStatusBadge";
 import { CLUSTER, RPC_URL } from "../lib/anchor";
 
@@ -16,24 +19,22 @@ function InvestorInner() {
             Connected to {CLUSTER} – KYC-gated vkUSDC vault.
           </p>
         </div>
-        <KycStatusBadge />
+        <div className="flex items-center gap-4">
+          <KycStatusBadge />
+          <WalletConnectButton />
+        </div>
       </header>
-      {/* Deposit/Withdraw forms and stats will be added here in the next step */}
-      <div className="text-sm text-muted">
-        RPC: {RPC_URL}. Deposit/withdraw will be enabled after program IDs are
-        set in `.env.local` and the IDLs are generated.
+      <VaultStats />
+      <div className="grid grid-cols-2 gap-4">
+        <DepositForm />
+        <WithdrawForm />
       </div>
+      <TransactionHistory />
     </div>
   );
 }
 
 export default function InvestorPage() {
-  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
-
-  return (
-    <WalletProvider wallets={wallets} autoConnect={false}>
-      <InvestorInner />
-    </WalletProvider>
-  );
+  return <InvestorInner />;
 }
 

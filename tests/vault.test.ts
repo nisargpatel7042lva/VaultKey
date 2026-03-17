@@ -44,7 +44,7 @@ describe.skip("vault", () => {
       .signers([admin])
       .rpc();
 
-    const state = await vault.account.vaultState.fetch(vaultStatePda);
+    const state = await (vault.account as any).vaultState.fetch(vaultStatePda);
     expect(state.admin.toBase58()).to.eq(admin.publicKey.toBase58());
     expect(state.vaspDid).to.eq("did:web:vaultkey.finance");
   });

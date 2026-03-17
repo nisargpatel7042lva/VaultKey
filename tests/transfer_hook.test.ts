@@ -32,7 +32,7 @@ describe.skip("transfer_hook", () => {
   it("initializes extra account meta list pointing at kyc_registry", async () => {
     // Ensure kyc_registry config exists (idempotent-ish for localnet runs)
     try {
-      await kycRegistry.account.kycRegistryConfig.fetch(kycConfigPda);
+      await (kycRegistry.account as any).kycRegistryConfig.fetch(kycConfigPda);
     } catch {
       await kycRegistry.methods
         .initialize()

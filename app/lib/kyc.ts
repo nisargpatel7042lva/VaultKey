@@ -74,3 +74,36 @@ export function isKycValid(cred: KycCredential | null): {
   return { valid: true };
 }
 
+export async function fetchAllCredentials(
+  connection: Connection,
+): Promise<KycCredential[]> {
+  const discriminator = Buffer.from(
+    // Anchor 8-byte discriminator for "account KycCredential" would normally
+    // be derived; for now we match all program accounts with expected size
+    [],
+  );
+  const accounts = await connection.getProgramAccounts(
+    KYC_REGISTRY_PROGRAM_ID,
+    {
+      filters: [
+        {
+          dataSize: 8 + 32 + 1 + 8 + 8 + 1 + 1,
+        },
+      ],
+    },
+  );
+
+  return accounts
+    .map((acc) => {
+      const data = Buffer.from(acc.account.data);
+      if (data.length < 59) return null;
+      const walletPk = new PublicKey(data.subarray(8, 40)).toBase58();
+      const tier = data.readUInt8(40);
+      const issuedAt = readI64LE(data, 41);
+      const expiry = readI64LE(data, 49);
+      const amlCleared = data.readUInt8(57) === 1;
+      return { wallet: walletPk, tier, issuedAt, expiry, amlCleared };
+    })
+    .filter((x): x is KycCredential => x !== null);
+}
+

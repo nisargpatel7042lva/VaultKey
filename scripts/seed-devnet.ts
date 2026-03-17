@@ -24,19 +24,28 @@ async function main() {
 
   const admin = provider.wallet.publicKey;
 
+  const vkUsdcMintStr =
+    process.env.NEXT_PUBLIC_VKUSDC_MINT ?? process.env.VKUSDC_MINT ?? "";
+  if (!vkUsdcMintStr) {
+    throw new Error(
+      "Missing VKUSDC mint. Set NEXT_PUBLIC_VKUSDC_MINT (or VKUSDC_MINT).",
+    );
+  }
+  const vkUsdcMint = new PublicKey(vkUsdcMintStr);
+
   const kycConfigPda = PublicKey.findProgramAddressSync(
     [Buffer.from("kyc_registry_config")],
     kycRegistry.programId
   )[0];
 
-  const hookConfigPda = PublicKey.findProgramAddressSync(
-    [Buffer.from("transfer_hook_config")],
-    transferHook.programId
+  const extraAccountMetaListPda = PublicKey.findProgramAddressSync(
+    [Buffer.from("extra-account-metas"), vkUsdcMint.toBuffer()],
+    transferHook.programId,
   )[0];
 
   // Initialize kyc_registry config if missing.
   try {
-    await kycRegistry.account.kycRegistryConfig.fetch(kycConfigPda);
+    await (kycRegistry.account as any).kycRegistryConfig.fetch(kycConfigPda);
   } catch {
     await kycRegistry.methods
       .initialize()
@@ -48,15 +57,19 @@ async function main() {
       .rpc();
   }
 
-  // Initialize transfer_hook config if missing.
+  // Initialize transfer_hook validation account if missing.
   try {
-    await transferHook.account.transferHookConfig.fetch(hookConfigPda);
+    // Existence check: just fetch account info via RPC.
+    const info = await provider.connection.getAccountInfo(extraAccountMetaListPda);
+    if (!info) throw new Error("missing");
   } catch {
     await transferHook.methods
-      .initializeExtraAccountMetaList(kycRegistry.programId)
+      .initializeExtraAccountMetaList()
       .accounts({
-        config: hookConfigPda,
-        admin,
+        payer: admin,
+        extraAccountMetaList: extraAccountMetaListPda,
+        mint: vkUsdcMint,
+        kycRegistryProgram: kycRegistry.programId,
         systemProgram: SystemProgram.programId,
       })
       .rpc();

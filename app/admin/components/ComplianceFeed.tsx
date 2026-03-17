@@ -2,12 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { getMockKytFeed, MockKytEvent } from "../../lib/mock-data";
+import {
+  BackendEvent,
+  subscribeToBackendEvents,
+} from "../../lib/backend";
 
 export function ComplianceFeed() {
-  const [events, setEvents] = useState<MockKytEvent[]>([]);
+  const [events, setEvents] = useState<MockKytEvent[]>(getMockKytFeed());
 
   useEffect(() => {
-    setEvents(getMockKytFeed());
+    const unsubscribe = subscribeToBackendEvents((evt: BackendEvent) => {
+      if (evt.type !== "kyt") return;
+      const dir: MockKytEvent["direction"] =
+        evt.data.direction === 0 ? "deposit" : "withdraw";
+      const riskTier: MockKytEvent["riskTier"] = evt.data.riskTier;
+      const row: MockKytEvent = {
+        wallet: evt.data.wallet,
+        amountUsdc: evt.data.amountUsdc,
+        direction: dir,
+        riskTier,
+        timestamp: new Date(evt.data.timestamp).toLocaleTimeString(),
+      };
+      setEvents((prev) => [row, ...prev].slice(0, 20));
+    });
+    return () => unsubscribe();
   }, []);
 
   const badge = (risk: MockKytEvent["riskTier"]) => {

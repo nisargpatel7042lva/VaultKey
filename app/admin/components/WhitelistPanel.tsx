@@ -1,11 +1,27 @@
 "use client";
 
-import { getMockWhitelist, MockWhitelistRow } from "../../lib/mock-data";
+import { useEffect, useState } from "react";
+import { getConnection } from "../../lib/anchor";
+import { fetchAllCredentials, KycCredential } from "../../lib/kyc";
+
+type Status = "VERIFIED" | "BLOCKED" | "EXPIRED";
 
 export function WhitelistPanel() {
-  const rows: MockWhitelistRow[] = getMockWhitelist();
+  const [rows, setRows] = useState<KycCredential[]>([]);
 
-  const badgeClass = (status: MockWhitelistRow["status"]) => {
+  useEffect(() => {
+    (async () => {
+      try {
+        const conn = getConnection();
+        const creds = await fetchAllCredentials(conn);
+        setRows(creds);
+      } catch {
+        setRows([]);
+      }
+    })();
+  }, []);
+
+  const badgeClass = (status: Status) => {
     switch (status) {
       case "VERIFIED":
         return "bg-green-500/10 text-green-400 border-green-500/50";
@@ -39,37 +55,51 @@ export function WhitelistPanel() {
               <th className="py-1 text-left font-normal">Status</th>
               <th className="py-1 text-left font-normal">Issued</th>
               <th className="py-1 text-left font-normal">Expiry</th>
-              <th className="py-1 text-right font-normal">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r, i) => (
+            {rows.map((r, i) => {
+              const now = Math.floor(Date.now() / 1000);
+              let status: Status = "VERIFIED";
+              if (!r.amlCleared) status = "BLOCKED";
+              else if (r.expiry <= now) status = "EXPIRED";
+              const tierLabel = r.tier === 2 ? "institutional" : "retail";
+
+              const issuedDate = new Date(r.issuedAt * 1000)
+                .toISOString()
+                .slice(0, 10);
+              const expiryDate = new Date(r.expiry * 1000)
+                .toISOString()
+                .slice(0, 10);
+
+              return (
               <tr key={i} className="border-b border-border/40 last:border-0">
                 <td className="py-1 font-mono text-[11px]">
                   {r.wallet.slice(0, 6)}…{r.wallet.slice(-4)}
                 </td>
-                <td className="py-1 capitalize">{r.tier}</td>
+                <td className="py-1 capitalize">{tierLabel}</td>
                 <td className="py-1">
                   <span
                     className={`inline-flex items-center rounded px-2 py-0.5 border ${badgeClass(
-                      r.status,
+                      status,
                     )}`}
                   >
-                    {r.status}
+                    {status}
                   </span>
                 </td>
-                <td className="py-1">{r.issuedAt}</td>
-                <td className="py-1">{r.expiry}</td>
-                <td className="py-1 text-right">
-                  <button
-                    type="button"
-                    className="rounded border border-red-500/50 bg-red-500/10 px-2 py-0.5 text-[11px] text-red-400 hover:bg-red-500/20"
-                  >
-                    Revoke
-                  </button>
+                <td className="py-1">{issuedDate}</td>
+                <td className="py-1">{expiryDate}</td>
+              </tr>
+            );
+            })}
+            {rows.length === 0 && (
+              <tr>
+                <td className="py-2 text-muted" colSpan={5}>
+                  No credentials found. Once the `kyc_registry` program is
+                  deployed and credentials are issued, they will appear here.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

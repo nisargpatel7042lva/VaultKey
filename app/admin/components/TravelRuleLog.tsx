@@ -1,12 +1,39 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   getMockTravelRuleLog,
   MockTravelRuleEvent,
 } from "../../lib/mock-data";
+import { getBackendUrl } from "../../lib/backend";
 
 export function TravelRuleLog() {
-  const rows: MockTravelRuleEvent[] = getMockTravelRuleLog();
+  const [rows, setRows] = useState<MockTravelRuleEvent[]>(
+    getMockTravelRuleLog(),
+  );
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(`${getBackendUrl()}/travel-rule`);
+        if (!res.ok) return;
+        const data = (await res.json()) as any[];
+        const mapped: MockTravelRuleEvent[] = data.map((d) => ({
+          senderWallet: String(d.senderWallet ?? ""),
+          senderVasp: String(d.senderVasp ?? ""),
+          amountUsdc: Number(d.amountUsdc ?? 0),
+          timestamp: new Date(
+            Number(d.timestamp ?? Date.now()),
+          ).toLocaleTimeString(),
+          ackRef: String(d.ack?.ref ?? ""),
+        }));
+        if (mapped.length) setRows(mapped);
+      } catch {
+        // stay on mock data
+      }
+    };
+    void load();
+  }, []);
 
   return (
     <section className="space-y-2 rounded border border-border bg-surface px-4 py-3 text-sm">

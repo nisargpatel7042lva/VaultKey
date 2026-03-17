@@ -1,0 +1,5 @@
+[toolchain]
+# Use a modern host toolchain for building TypeScript tooling and any host-side Rust.
+# Solana SBF builds use the Solana-bundled toolchain via `cargo-build-sbf`.
+channel = "stable"
+

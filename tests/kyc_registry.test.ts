@@ -30,7 +30,10 @@ describe("kyc_registry", () => {
       .signers([admin])
       .rpc();
 
-    const config = await program.account.kycRegistryConfig.fetch(configPda);
+    // IDL typing is dynamic in this repo; cast to `any` for account fetches.
+    const config = await (program.account as any).kycRegistryConfig.fetch(
+      configPda
+    );
     expect(config.admin.toBase58()).to.eq(admin.publicKey.toBase58());
   });
 
@@ -54,7 +57,9 @@ describe("kyc_registry", () => {
       .signers([admin])
       .rpc();
 
-    const cred = await program.account.kycCredential.fetch(credentialPda);
+    const cred = await (program.account as any).kycCredential.fetch(
+      credentialPda
+    );
     expect(cred.wallet.toBase58()).to.eq(wallet.publicKey.toBase58());
     expect(cred.tier).to.eq(1);
     expect(cred.amlCleared).to.eq(true);
@@ -162,7 +167,9 @@ describe("kyc_registry", () => {
       .signers([admin])
       .rpc();
 
-    const cred = await program.account.kycCredential.fetch(credentialPda);
+    const cred = await (program.account as any).kycCredential.fetch(
+      credentialPda
+    );
     expect(cred.amlCleared).to.eq(false);
   });
 });

@@ -26,6 +26,28 @@ async function main() {
     program.programId
   )[0];
 
+  // Ensure the kyc_registry config is initialized before issuing credentials.
+  // This makes the `issue-kyc` command idempotent for devnet/demo.
+  const configAlreadyExists = await (async () => {
+    try {
+      await (program.account as any).kycRegistryConfig.fetch(configPda);
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
+  if (!configAlreadyExists) {
+    await program.methods
+      .initialize()
+      .accounts({
+        config: configPda,
+        admin: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+  }
+
   const sig = await program.methods
     .issueCredential(tier, expiryDays)
     .accounts({

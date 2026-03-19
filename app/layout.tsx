@@ -13,32 +13,37 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="bg-background text-white">
         <Providers>
           <div className="min-h-screen flex">
-            <aside className="w-64 bg-background border-r border-border px-6 py-4 flex flex-col">
-              <div className="text-xl font-semibold tracking-tight mb-6">
-                VaultKey
+            <aside className="w-64 bg-background/70 backdrop-blur border-r border-border/70 px-6 py-4 flex flex-col">
+              <div className="mb-6">
+                <div className="text-xl font-semibold tracking-tight">
+                  VaultKey
+                </div>
+                <div className="text-xs text-muted mt-1">
+                  Institutional permissioned yield
+                </div>
               </div>
               <nav className="space-y-2 text-sm">
                 <a
                   href="/investor"
-                  className="block px-2 py-1 rounded border border-transparent hover:border-border"
+                  className="block px-2 py-1 rounded border border-transparent hover:border-border/90 hover:bg-surface/40 transition"
                 >
                   Investor
                 </a>
                 <a
                   href="/admin"
-                  className="block px-2 py-1 rounded border border-transparent hover:border-border"
+                  className="block px-2 py-1 rounded border border-transparent hover:border-border/90 hover:bg-surface/40 transition"
                 >
                   Admin
                 </a>
                 <a
                   href="/about"
-                  className="block px-2 py-1 rounded border border-transparent hover:border-border"
+                  className="block px-2 py-1 rounded border border-transparent hover:border-border/90 hover:bg-surface/40 transition"
                 >
                   About
                 </a>
               </nav>
             </aside>
-            <main className="flex-1 bg-slate-950/60 px-8 py-6">{children}</main>
+            <main className="flex-1 px-8 py-6">{children}</main>
           </div>
         </Providers>
       </body>

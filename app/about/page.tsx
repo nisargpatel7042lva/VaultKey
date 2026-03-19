@@ -1,5 +1,3 @@
-"use client";
-
 export default function AboutPage() {
   return (
     <div className="space-y-6 max-w-3xl">

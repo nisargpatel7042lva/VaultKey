@@ -82,22 +82,24 @@ async function main() {
 
   const providerConnection = provider.connection;
 
-  const mintLen = getMintLen([ExtensionType.TransferHook]);
+  // Token-2022 transfer hooks are typically used together with
+  // `DefaultAccountState`; allocate the mint with both extensions so
+  // `InitializeMint2` validates the account data layout correctly.
+  const mintExtensions = [ExtensionType.TransferHook, ExtensionType.DefaultAccountState];
+  const mintLen = getMintLen(mintExtensions);
   const rentExempt =
     await getMinimumBalanceForRentExemptMintWithExtensions(
       connection,
-      [ExtensionType.TransferHook],
+      mintExtensions,
       "confirmed",
     );
-
-  // Step A: create mint account (only if needed)
-  const tx = new Transaction();
 
   if (createNewMint) {
     const mintInfo = await providerConnection.getAccountInfo(vkUsdcMint, "confirmed");
     if (mintInfo) throw new Error(`vkUSDC mint already exists: ${vkUsdcMint.toBase58()}`);
 
-    tx.add(
+    // Step A1: create mint account
+    const createTx = new Transaction().add(
       SystemProgram.createAccount({
         fromPubkey: admin,
         newAccountPubkey: vkUsdcMint,
@@ -107,35 +109,36 @@ async function main() {
       }),
     );
 
-    tx.add(
-      createInitializeMint2Instruction(
-        vkUsdcMint,
-        6,
-        admin, // mint authority
-        null, // freeze authority
-        TOKEN_2022_PROGRAM_ID,
-      ),
-    );
+    await provider.sendAndConfirm(createTx, [vkUsdcMintKeypair!]);
 
-    tx.add(
-      createInitializeTransferHookInstruction(
-        vkUsdcMint,
-        admin, // transfer hook authority
-        transferHookProgramId,
-        TOKEN_2022_PROGRAM_ID,
-      ),
-    );
+    // Step A2: initialize mint + transfer hook extension
+    const initTx = new Transaction()
+      .add(
+        createInitializeMint2Instruction(
+          vkUsdcMint,
+          6,
+          admin, // mint authority
+          null, // freeze authority
+          TOKEN_2022_PROGRAM_ID,
+        ),
+      )
+      .add(
+        createInitializeTransferHookInstruction(
+          vkUsdcMint,
+          admin, // transfer hook authority
+          transferHookProgramId,
+          TOKEN_2022_PROGRAM_ID,
+        ),
+      );
+
+    await provider.sendAndConfirm(initTx, []);
   } else {
     // If mint is already set, we'll verify transfer hook extension below.
   }
 
-  if (tx.instructions.length > 0) {
-    await provider.sendAndConfirm(tx, vkUsdcMintKeypair ? [vkUsdcMintKeypair] : []);
-  }
-
   // Step A2: ensure transfer hook extension points to A2
   {
-  const mintInfo = await getMint(
+    const mintInfo = await getMint(
       providerConnection,
       vkUsdcMint,
       "confirmed",

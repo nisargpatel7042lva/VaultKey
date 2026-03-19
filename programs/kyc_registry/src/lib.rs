@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 // Placeholder. Anchor will overwrite this on `anchor keys sync` / deploy.
-declare_id!("11111111111111111111111111111111");
+declare_id!("7X68YPL5kqbBaNETLqathZoT9BZokZh4VsGMU641yTgD");
 
 #[program]
 pub mod kyc_registry {
@@ -10,7 +10,7 @@ pub mod kyc_registry {
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         let config = &mut ctx.accounts.config;
         config.admin = ctx.accounts.admin.key();
-        config.bump = *ctx.bumps.get("config").unwrap();
+        config.bump = ctx.bumps.config;
         Ok(())
     }
 
@@ -42,7 +42,7 @@ pub mod kyc_registry {
         credential.issued_at = now;
         credential.expiry = expiry;
         credential.aml_cleared = true;
-        credential.bump = *ctx.bumps.get("credential").unwrap();
+        credential.bump = ctx.bumps.credential;
 
         Ok(())
     }

@@ -11,7 +11,7 @@ use spl_tlv_account_resolution::{
 use spl_transfer_hook_interface::instruction::{ExecuteInstruction, TransferHookInstruction};
 
 // Placeholder. Anchor will overwrite this on `anchor keys sync` / deploy.
-declare_id!("11111111111111111111111111111111");
+declare_id!("2WVrkAtvzzakYNLNNMxfEnYWmBdrAnCqPqfHhAKUXu6T");
 
 // Indices used by the ExtraAccountMeta configuration in the Execute accounts list.
 // 0: source_token
@@ -58,9 +58,12 @@ pub mod transfer_hook {
             &seeds,
             false, // is_signer
             false, // is_writable
-        )?];
+        )
+        .map_err(|_| TransferHookError::ExtraAccountMetaListInitFailed)?];
 
-        let account_size = ExtraAccountMetaList::size_of(metas.len())? as u64;
+        let account_size = ExtraAccountMetaList::size_of(metas.len())
+            .map_err(|_| TransferHookError::ExtraAccountMetaListInitFailed)?
+            as u64;
         let lamports = Rent::get()?.minimum_balance(account_size as usize);
 
         let mint = ctx.accounts.mint.key();
@@ -86,13 +89,19 @@ pub mod transfer_hook {
         )?;
 
         // Initialize its TLV data with our extra account meta configuration.
+        //
+        // `spl_tlv_account_resolution::ExtraAccountMetaList::init` returns a
+        // `solana_program_error::ProgramError` from the SPL crate which doesn't
+        // automatically convert into Anchor's error type, so we map it into a
+        // local error code.
         ExtraAccountMetaList::init::<ExecuteInstruction>(
             &mut ctx
                 .accounts
                 .extra_account_meta_list
                 .try_borrow_mut_data()?,
             &metas,
-        )?;
+        )
+        .map_err(|_| TransferHookError::ExtraAccountMetaListInitFailed)?;
 
         Ok(())
     }
@@ -241,6 +250,9 @@ pub struct KycCredential {
 
 #[error_code]
 pub enum TransferHookError {
+    #[msg("Failed to initialize ExtraAccountMetaList")]
+    ExtraAccountMetaListInitFailed,
+
     #[msg("Recipient wallet is not KYC verified")]
     NotKyced,
 

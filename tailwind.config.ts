@@ -9,10 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0f1117",
-        surface: "#111827",
-        border: "#1f2937",
-        accent: "#38bdf8",
+        // Futuristic palette inspired by the project logo (violet + cyan).
+        background: "#070613",
+        // Slightly translucent so the neon background shows through (glass effect).
+        surface: "rgba(12, 11, 31, 0.68)",
+        border: "rgba(167, 139, 250, 0.28)",
+        accent: "#a78bfa",
+        accent2: "#22d3ee",
         success: "#22c55e",
         warning: "#facc15",
         danger: "#ef4444",

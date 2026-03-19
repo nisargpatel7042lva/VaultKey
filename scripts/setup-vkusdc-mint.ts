@@ -18,7 +18,16 @@ import {
 import crypto from "crypto";
 
 function isPlaceholder(v: string | undefined) {
-  return !v || v.trim() === "" || v.startsWith("<") || v.includes("pubkey");
+  const s = (v ?? "").trim();
+  // Common placeholder patterns used during development.
+  return (
+    !s ||
+    s.startsWith("<") ||
+    s.includes("pubkey") ||
+    s.toUpperCase().startsWith("PUT_") ||
+    s.toUpperCase() === "PUT" ||
+    s.toUpperCase().includes("PUT_")
+  );
 }
 
 function mustPubkey(name: string, v: string | undefined): PublicKey {
@@ -50,6 +59,13 @@ async function main() {
   const keypairPath =
     process.env.ANCHOR_WALLET_PATH ??
     path.join(os.homedir(), ".config", "solana", "id.json");
+  if (!fs.existsSync(keypairPath)) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[setup-vkusdc-mint] Missing keypair at ${keypairPath}. Skipping setup.`,
+    );
+    return;
+  }
   const keypairJson = JSON.parse(fs.readFileSync(keypairPath, "utf8"));
   const secretKey = Array.isArray(keypairJson)
     ? Uint8Array.from(keypairJson)
@@ -63,13 +79,31 @@ async function main() {
   });
   anchor.setProvider(provider);
 
+  // Vercel/CI safety:
+  // Judges should be able to deploy/view the UI even if program IDs are
+  // still placeholders. If required env vars are missing, we exit cleanly.
+  const transferHookProgramIdEnv = process.env.NEXT_PUBLIC_TRANSFER_HOOK_PROGRAM_ID;
+  const kycRegistryProgramIdEnv = process.env.NEXT_PUBLIC_KYC_REGISTRY_PROGRAM_ID;
+  const transferHookIsPlaceholder = isPlaceholder(transferHookProgramIdEnv);
+  const kycRegistryIsPlaceholder = isPlaceholder(kycRegistryProgramIdEnv);
+
+  if (transferHookIsPlaceholder || kycRegistryIsPlaceholder) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[setup-vkusdc-mint] Skipping because required program IDs are placeholders. " +
+        `NEXT_PUBLIC_TRANSFER_HOOK_PROGRAM_ID=${String(transferHookProgramIdEnv)} ` +
+        `NEXT_PUBLIC_KYC_REGISTRY_PROGRAM_ID=${String(kycRegistryProgramIdEnv)}`,
+    );
+    return;
+  }
+
   const transferHookProgramId = mustPubkey(
     "NEXT_PUBLIC_TRANSFER_HOOK_PROGRAM_ID",
-    process.env.NEXT_PUBLIC_TRANSFER_HOOK_PROGRAM_ID,
+    transferHookProgramIdEnv,
   );
   const kycRegistryProgramId = mustPubkey(
     "NEXT_PUBLIC_KYC_REGISTRY_PROGRAM_ID",
-    process.env.NEXT_PUBLIC_KYC_REGISTRY_PROGRAM_ID,
+    kycRegistryProgramIdEnv,
   );
 
   // If vkUSDC mint isn't set yet, we create a new Token-2022 mint.

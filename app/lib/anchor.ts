@@ -5,10 +5,17 @@ import { Connection, PublicKey } from "@solana/web3.js";
 
 function safePublicKey(envVar: string | undefined, fallback: string): PublicKey {
   try {
-    if (!envVar || envVar.trim() === "" || envVar.startsWith("<")) {
+    const s = (envVar ?? "").trim();
+    if (
+      !s ||
+      s.startsWith("<") ||
+      s.toUpperCase().startsWith("PUT_") ||
+      s.toUpperCase() === "PUT" ||
+      s.toUpperCase().includes("PUT_")
+    ) {
       return new PublicKey(fallback);
     }
-    return new PublicKey(envVar);
+    return new PublicKey(s);
   } catch {
     return new PublicKey(fallback);
   }

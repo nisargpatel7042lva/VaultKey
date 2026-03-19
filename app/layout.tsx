@@ -30,6 +30,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 >
                   Admin
                 </a>
+                <a
+                  href="/about"
+                  className="block px-2 py-1 rounded border border-transparent hover:border-border"
+                >
+                  About
+                </a>
               </nav>
             </aside>
             <main className="flex-1 bg-slate-950/60 px-8 py-6">{children}</main>

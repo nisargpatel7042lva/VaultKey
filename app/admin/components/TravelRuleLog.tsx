@@ -65,7 +65,7 @@ export function TravelRuleLog() {
                 </td>
                 <td className="py-1">{r.senderVasp}</td>
                 <td className="py-1 text-right">
-                  {r.amountUsdc.toLocaleString(undefined, {
+                  {(r.amountUsdc / 1_000_000).toLocaleString(undefined, {
                     maximumFractionDigits: 2,
                   })}
                 </td>

@@ -78,12 +78,16 @@ async function main() {
       broadcast(msg);
 
       if (msg.type === "travel_rule") {
+        const txRef =
+          msg.data.txRef && msg.data.txRef !== "00000000"
+            ? msg.data.txRef
+            : toTxRef(msg.data.signature);
         const payload: TravelRulePayload = {
           senderWallet: msg.data.senderWallet,
           senderVasp: msg.data.senderVasp,
           amountUsdc: msg.data.amountUsdc,
           timestamp: msg.data.timestamp,
-          txRef: msg.data.txRef || toTxRef(msg.data.signature),
+          txRef,
         };
         try {
           await fetch(`http://localhost:${vaspPort}/travel-rule`, {

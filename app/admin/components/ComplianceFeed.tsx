@@ -68,7 +68,10 @@ export function ComplianceFeed() {
                 </span>{" "}
                 <span className="text-muted">
                   {e.direction === "deposit" ? "deposited" : "withdrew"}{" "}
-                  {e.amountUsdc.toLocaleString()} USDC
+                  {(e.amountUsdc / 1_000_000).toLocaleString(undefined, {
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  USDC
                 </span>
               </div>
               <div className="text-muted">{e.timestamp}</div>

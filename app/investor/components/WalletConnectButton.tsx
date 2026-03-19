@@ -2,14 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { PhantomWalletName } from "@solana/wallet-adapter-phantom";
 
 function InnerButton() {
-  const { publicKey, connected, connecting, connect, disconnect } = useWallet();
+  const {
+    publicKey,
+    connected,
+    connecting,
+    disconnecting,
+    wallet,
+    connect,
+    disconnect,
+    select,
+  } = useWallet();
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (!connecting) setBusy(false);
-  }, [connecting]);
+  const [connectAfterSelect, setConnectAfterSelect] = useState(false);
 
   const label = connected
     ? `${publicKey?.toBase58().slice(0, 4)}…${publicKey
@@ -18,17 +26,52 @@ function InnerButton() {
     : "Connect Phantom";
 
   const handleClick = async () => {
-    try {
-      setBusy(true);
-      if (connected) {
+    setBusy(true);
+
+    if (connected) {
+      try {
         await disconnect();
-      } else {
-        await connect();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setBusy(false);
       }
+      return;
+    }
+
+    // `connect()` throws `WalletNotSelectedError` until a wallet is selected
+    // in the WalletProvider context.
+    if (!wallet) {
+      setConnectAfterSelect(true);
+      select(PhantomWalletName);
+      return;
+    }
+
+    try {
+      await connect();
+    } catch (e) {
+      console.error(e);
     } finally {
       setBusy(false);
     }
   };
+
+  useEffect(() => {
+    if (!connectAfterSelect) return;
+    if (!wallet) return;
+    if (connected || connecting || disconnecting) return;
+
+    (async () => {
+      try {
+        await connect();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setConnectAfterSelect(false);
+        setBusy(false);
+      }
+    })();
+  }, [connectAfterSelect, wallet, connected, connecting, disconnecting, connect]);
 
   return (
     <button

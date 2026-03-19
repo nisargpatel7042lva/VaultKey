@@ -12,8 +12,7 @@ export default function AdminPage() {
         <div>
           <h1 className="text-xl font-semibold">Admin</h1>
           <p className="text-sm text-muted">
-            Real-time compliance view of the vkUSDC vault. All data is mocked
-            until the backend listener is wired.
+            Real-time compliance view of the vkUSDC vault over devnet logs.
           </p>
         </div>
       </header>

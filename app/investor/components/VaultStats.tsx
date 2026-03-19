@@ -1,42 +1,58 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Connection } from "@solana/web3.js";
 import { getConnection } from "../../lib/anchor";
-import { fetchVaultState, VaultState, calcNavPerShare } from "../../lib/vault";
-import { PublicKey } from "@solana/web3.js";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { getAssociatedTokenAddressSync, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { fetchVaultStateRaw } from "../../lib/vaultStateRaw";
 
 export function VaultStats() {
-  const [state, setState] = useState<VaultState | null>(null);
+  const { publicKey } = useWallet();
+  const [tvl, setTvl] = useState<number>(0);
+  const [nav, setNav] = useState<number>(1.0);
+  const [yourShares, setYourShares] = useState<number | null>(null);
+  const [yourValue, setYourValue] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
         const connection = getConnection();
-        // For now we assume vault is initialized; if not, we swallow errors and show placeholders.
-        const programId = new PublicKey(
-          process.env.NEXT_PUBLIC_VAULT_PROGRAM_ID ??
-            "11111111111111111111111111111111",
-        );
-        // We reuse fetchVaultState helper which derives the PDA.
-        const mockProgram = { programId } as any;
-        const vs = await fetchVaultState(mockProgram);
-        setState(vs);
+        const state = await fetchVaultStateRaw(connection);
+        setTvl(Number(state.totalAssets) / 1_000_000);
+        setNav(Number(state.navPerShare) / 1_000_000);
+
+        if (publicKey) {
+          // Derive vkUSDC ATA under the mint's token program (Token-2022).
+          const mintInfo = await connection.getAccountInfo(state.vkUsdcMint, "confirmed");
+          const tokenProgram = mintInfo?.owner;
+          if (tokenProgram) {
+            const ata = getAssociatedTokenAddressSync(
+              state.vkUsdcMint,
+              publicKey,
+              false,
+              tokenProgram,
+              ASSOCIATED_TOKEN_PROGRAM_ID,
+            );
+            const bal = await connection.getTokenAccountBalance(ata, "confirmed").catch(() => null);
+            const ui = bal?.value?.uiAmount ?? null;
+            setYourShares(ui);
+            if (ui != null) setYourValue(ui * (Number(state.navPerShare) / 1_000_000));
+          }
+        } else {
+          setYourShares(null);
+          setYourValue(null);
+        }
       } catch {
-        setState(null);
+        setTvl(0);
+        setNav(1.0);
+        setYourShares(null);
+        setYourValue(null);
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
-
-  const tvl =
-    state && state.totalAssets
-      ? Number(state.totalAssets) / 1_000_000
-      : 0;
-
-  const nav = state ? calcNavPerShare(state) : 1.0;
+  }, [publicKey]);
 
   return (
     <section className="grid grid-cols-2 gap-4 rounded border border-border bg-surface px-4 py-3 text-sm">
@@ -47,7 +63,7 @@ export function VaultStats() {
         </div>
       </div>
       <div>
-        <div className="text-xs text-muted">Current APY (mock)</div>
+        <div className="text-xs text-muted">Current APY (mocked yield)</div>
         <div className="text-lg font-semibold">4.2%</div>
       </div>
       <div>
@@ -58,7 +74,18 @@ export function VaultStats() {
       </div>
       <div>
         <div className="text-xs text-muted">Your balance</div>
-        <div className="text-lg font-semibold">Coming soon</div>
+        <div className="text-lg font-semibold">
+          {loading
+            ? "—"
+            : publicKey
+              ? `${(yourShares ?? 0).toLocaleString()} vkUSDC`
+              : "Connect wallet"}
+        </div>
+        <div className="text-xs text-muted">
+          {loading || !publicKey || yourValue == null
+            ? ""
+            : `≈ ${yourValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} USDC`}
+        </div>
       </div>
     </section>
   );

@@ -1,13 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import {
-  ConnectionProvider,
-  WalletProvider,
-  useWallet,
-} from "@solana/wallet-adapter-react";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
-import { RPC_URL } from "../../lib/anchor";
+import { useEffect, useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 function InnerButton() {
   const { publicKey, connected, connecting, connect, disconnect } = useWallet();
@@ -54,14 +48,6 @@ function InnerButton() {
 }
 
 export function WalletConnectButton() {
-  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
-
-  return (
-    <ConnectionProvider endpoint={RPC_URL}>
-      <WalletProvider wallets={wallets} autoConnect={false}>
-        <InnerButton />
-      </WalletProvider>
-    </ConnectionProvider>
-  );
+  return <InnerButton />;
 }
 

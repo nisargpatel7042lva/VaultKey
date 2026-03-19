@@ -25,8 +25,6 @@ export function WhitelistPanel() {
     switch (status) {
       case "VERIFIED":
         return "bg-green-500/10 text-green-400 border-green-500/50";
-      case "PENDING":
-        return "bg-amber-500/10 text-amber-300 border-amber-500/50";
       case "BLOCKED":
         return "bg-red-500/10 text-red-400 border-red-500/50";
       case "EXPIRED":

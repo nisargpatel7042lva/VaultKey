@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getMockTravelRuleLog,
-  MockTravelRuleEvent,
-} from "../../lib/mock-data";
 import { getBackendUrl } from "../../lib/backend";
 
+type Row = {
+  senderWallet: string;
+  senderVasp: string;
+  amountUsdc: number;
+  timestamp: string;
+  ackRef: string;
+};
+
 export function TravelRuleLog() {
-  const [rows, setRows] = useState<MockTravelRuleEvent[]>(
-    getMockTravelRuleLog(),
-  );
+  const [rows, setRows] = useState<Row[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -18,7 +20,7 @@ export function TravelRuleLog() {
         const res = await fetch(`${getBackendUrl()}/travel-rule`);
         if (!res.ok) return;
         const data = (await res.json()) as any[];
-        const mapped: MockTravelRuleEvent[] = data.map((d) => ({
+        const mapped: Row[] = data.map((d) => ({
           senderWallet: String(d.senderWallet ?? ""),
           senderVasp: String(d.senderVasp ?? ""),
           amountUsdc: Number(d.amountUsdc ?? 0),
@@ -27,9 +29,9 @@ export function TravelRuleLog() {
           ).toLocaleTimeString(),
           ackRef: String(d.ack?.ref ?? ""),
         }));
-        if (mapped.length) setRows(mapped);
+        setRows(mapped);
       } catch {
-        // stay on mock data
+        setRows([]);
       }
     };
     void load();
@@ -40,7 +42,7 @@ export function TravelRuleLog() {
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-sm">Travel Rule log</h2>
         <span className="text-xs text-muted">
-          Events sent to VASP (mocked)
+          Events sent to VASP (devnet)
         </span>
       </div>
       <div className="overflow-x-auto">

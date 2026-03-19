@@ -1,22 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getMockKytFeed, MockKytEvent } from "../../lib/mock-data";
 import {
   BackendEvent,
   subscribeToBackendEvents,
 } from "../../lib/backend";
 
+type Row = {
+  wallet: string;
+  amountUsdc: number;
+  direction: "deposit" | "withdraw";
+  riskTier: "LOW" | "MEDIUM" | "HIGH";
+  timestamp: string;
+};
+
 export function ComplianceFeed() {
-  const [events, setEvents] = useState<MockKytEvent[]>(getMockKytFeed());
+  const [events, setEvents] = useState<Row[]>([]);
 
   useEffect(() => {
     const unsubscribe = subscribeToBackendEvents((evt: BackendEvent) => {
       if (evt.type !== "kyt") return;
-      const dir: MockKytEvent["direction"] =
+      const dir: Row["direction"] =
         evt.data.direction === 0 ? "deposit" : "withdraw";
-      const riskTier: MockKytEvent["riskTier"] = evt.data.riskTier;
-      const row: MockKytEvent = {
+      const riskTier: Row["riskTier"] = evt.data.riskTier;
+      const row: Row = {
         wallet: evt.data.wallet,
         amountUsdc: evt.data.amountUsdc,
         direction: dir,
@@ -28,7 +35,7 @@ export function ComplianceFeed() {
     return () => unsubscribe();
   }, []);
 
-  const badge = (risk: MockKytEvent["riskTier"]) => {
+  const badge = (risk: Row["riskTier"]) => {
     switch (risk) {
       case "LOW":
         return "bg-green-500/10 text-green-400 border-green-500/50";
@@ -45,7 +52,7 @@ export function ComplianceFeed() {
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-sm">Compliance feed</h2>
         <span className="text-xs text-muted">
-          Live KYT events (mocked for now)
+          Live KYT events (devnet)
         </span>
       </div>
       <div className="space-y-2 text-xs">

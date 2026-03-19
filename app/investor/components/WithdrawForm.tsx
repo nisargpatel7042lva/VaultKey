@@ -2,11 +2,14 @@
 
 import { FormEvent, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { Transaction } from "@solana/web3.js";
+import { buildWithdrawTxIxs } from "../../lib/vaultIx";
+import { getConnection } from "../../lib/anchor";
 
 const TRAVEL_RULE_THRESHOLD = 3_000; // USDC
 
 export function WithdrawForm() {
-  const { publicKey } = useWallet();
+  const { publicKey, sendTransaction } = useWallet();
   const [shares, setShares] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -26,12 +29,19 @@ export function WithdrawForm() {
       return;
     }
     setSubmitting(true);
-    setTimeout(() => {
+    try {
+      const { ixs, message: label } = await buildWithdrawTxIxs({
+        investor: publicKey,
+        sharesUi: shares,
+      });
+      const tx = new Transaction().add(...ixs);
+      const sig = await sendTransaction(tx, getConnection());
+      setMessage(`${label} submitted: ${sig.slice(0, 8)}…`);
+    } catch (err: any) {
+      setMessage(String(err?.message ?? err));
+    } finally {
       setSubmitting(false);
-      setMessage(
-        "Mock withdrawal submitted (Travel Rule event will be wired to backend in bucket E).",
-      );
-    }, 500);
+    }
   };
 
   return (

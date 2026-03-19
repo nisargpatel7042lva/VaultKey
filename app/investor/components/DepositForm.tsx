@@ -2,10 +2,12 @@
 
 import { FormEvent, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { isKycValid } from "../../lib/kyc";
+import { Transaction } from "@solana/web3.js";
+import { buildDepositTxIxs } from "../../lib/vaultIx";
+import { getConnection } from "../../lib/anchor";
 
 export function DepositForm() {
-  const { publicKey } = useWallet();
+  const { publicKey, sendTransaction } = useWallet();
   const [amount, setAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -21,12 +23,20 @@ export function DepositForm() {
       setMessage("Enter a positive USDC amount.");
       return;
     }
-    // For now we don't yet have program IDLs wired; mock success.
     setSubmitting(true);
-    setTimeout(() => {
+    try {
+      const { ixs, message: label } = await buildDepositTxIxs({
+        investor: publicKey,
+        amountUi: amount,
+      });
+      const tx = new Transaction().add(...ixs);
+      const sig = await sendTransaction(tx, getConnection());
+      setMessage(`${label} submitted: ${sig.slice(0, 8)}…`);
+    } catch (err: any) {
+      setMessage(String(err?.message ?? err));
+    } finally {
       setSubmitting(false);
-      setMessage("Mock deposit submitted (wire to Anchor in bucket B/C).");
-    }, 500);
+    }
   };
 
   return (

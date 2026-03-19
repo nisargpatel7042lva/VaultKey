@@ -1,29 +1,11 @@
 [package]
 name = "vault"
 version = "0.1.0"
-description = "VaultKey main vault program"
-edition = "2021"
-
-[lib]
-name = "vault"
-crate-type = ["cdylib", "lib"]
-
-[features]
-no-entrypoint = []
-idl-build = ["anchor-lang/idl-build"]
-default = []
-
-[dependencies]
-anchor-lang = "0.32.1"
-anchor-spl = { version = "0.32.1", features = ["token_2022"] }
-
-[package]
-name = "vault"
-version = "0.1.0"
 description = "VaultKey main vault program (vkUSDC yield vault with KYT + Travel Rule)"
 edition = "2021"
 
 [lib]
+name = "vault"
 crate-type = ["cdylib", "lib"]
 
 [features]

@@ -82,10 +82,11 @@ async function main() {
 
   const providerConnection = provider.connection;
 
-  // Token-2022 transfer hooks are typically used together with
-  // `DefaultAccountState`; allocate the mint with both extensions so
-  // `InitializeMint2` validates the account data layout correctly.
-  const mintExtensions = [ExtensionType.TransferHook, ExtensionType.DefaultAccountState];
+  // Allocate the mint sized for the TransferHook extension.
+  // Important: on devnet, `InitializeMint2` expects the mint to be
+  // allocated using the same extension set that the Token-2022 program
+  // is configured to initialize (TransferHook only).
+  const mintExtensions = [ExtensionType.TransferHook];
   const mintLen = getMintLen(mintExtensions);
   const rentExempt =
     await getMinimumBalanceForRentExemptMintWithExtensions(
@@ -111,25 +112,28 @@ async function main() {
 
     await provider.sendAndConfirm(createTx, [vkUsdcMintKeypair!]);
 
-    // Step A2: initialize mint + transfer hook extension
-    const initTx = new Transaction()
-      .add(
-        createInitializeMint2Instruction(
-          vkUsdcMint,
-          6,
-          admin, // mint authority
-          null, // freeze authority
-          TOKEN_2022_PROGRAM_ID,
-        ),
-      )
-      .add(
-        createInitializeTransferHookInstruction(
-          vkUsdcMint,
-          admin, // transfer hook authority
-          transferHookProgramId,
-          TOKEN_2022_PROGRAM_ID,
-        ),
-      );
+    // Step A2: initialize transfer hook extension then mint2.
+    //
+    // On devnet, `InitializeMint2` fails with `InvalidAccountData` if the
+    // mint is allocated for TransferHook but `InitializeTransferHook` hasn't
+    // run yet, so we do the extension init first.
+    const initTx = new Transaction().add(
+      createInitializeTransferHookInstruction(
+        vkUsdcMint,
+        admin, // transfer hook authority
+        transferHookProgramId,
+        TOKEN_2022_PROGRAM_ID,
+      ),
+    );
+    initTx.add(
+      createInitializeMint2Instruction(
+        vkUsdcMint,
+        6,
+        admin, // mint authority
+        null, // freeze authority
+        TOKEN_2022_PROGRAM_ID,
+      ),
+    );
 
     await provider.sendAndConfirm(initTx, []);
   } else {
@@ -212,7 +216,10 @@ async function main() {
     });
 
     const tx2 = new Transaction().add(ix);
-    await provider.sendAndConfirm(tx2, vkUsdcMintKeypair ? [vkUsdcMintKeypair] : []);
+    // `tx2` only needs the admin wallet signature (payer). `vkUsdcMintKeypair`
+    // is not a signer in the instruction keys, so do not pass it as an
+    // extra signer.
+    await provider.sendAndConfirm(tx2, []);
   }
 
   console.log("vkUSDC_MINT=" + vkUsdcMint.toBase58());

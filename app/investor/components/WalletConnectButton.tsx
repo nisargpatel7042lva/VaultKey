@@ -81,7 +81,7 @@ function WalletSelector() {
   return (
     <div className="flex items-center gap-2">
       <select
-        className="rounded border border-border bg-background px-2 py-1 text-xs outline-none focus:border-accent"
+        className="rounded-lg border border-border bg-background/80 px-3 py-1.5 text-xs outline-none focus:border-accent"
         value={selectedName}
         onChange={(e) => setSelectedName(e.target.value as any)}
         disabled={connected || busy || connecting}
@@ -98,7 +98,7 @@ function WalletSelector() {
           type="button"
           onClick={handleDisconnect}
           disabled={busy}
-          className="inline-flex items-center gap-2 rounded border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:border-accent disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium hover:border-accent disabled:opacity-60"
         >
           <span
             className={`h-2 w-2 rounded-full ${
@@ -112,7 +112,7 @@ function WalletSelector() {
           type="button"
           onClick={handleConnect}
           disabled={busy}
-          className="inline-flex items-center gap-2 rounded border border-accent bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent hover:bg-accent/20 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-lg border border-accent bg-accent/15 px-3 py-1.5 text-xs font-medium text-accent hover:bg-accent/25 disabled:opacity-60"
         >
           <span className="h-2 w-2 rounded-full bg-muted" />
           Connect

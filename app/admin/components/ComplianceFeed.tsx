@@ -48,18 +48,18 @@ export function ComplianceFeed() {
   };
 
   return (
-    <section className="space-y-2 rounded border border-border bg-surface px-4 py-3 text-sm">
+    <section className="space-y-3 rounded-2xl border border-border bg-surface px-5 py-4 text-sm">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm">Compliance feed</h2>
+        <h2 className="font-semibold text-sm tracking-wide">Compliance feed</h2>
         <span className="text-xs text-muted">
           Live KYT events (devnet)
         </span>
       </div>
-      <div className="space-y-2 text-xs">
+      <div className="space-y-2 text-xs max-h-80 overflow-auto pr-1">
         {events.map((e, i) => (
           <div
             key={i}
-            className="flex items-center justify-between border-b border-border/40 pb-1 last:border-0 last:pb-0"
+            className="flex items-center justify-between rounded-lg border border-border/50 bg-background/35 px-3 py-2"
           >
             <div>
               <div>

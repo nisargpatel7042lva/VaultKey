@@ -45,9 +45,9 @@ export function WithdrawForm() {
   };
 
   return (
-    <section className="space-y-2 rounded border border-border bg-surface px-4 py-3 text-sm">
+    <section className="space-y-3 rounded-2xl border border-border bg-surface px-5 py-4 text-sm shadow-[0_0_30px_rgba(34,211,238,0.10)]">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm">Withdraw</h2>
+        <h2 className="font-semibold text-sm tracking-wide">Withdraw</h2>
         <span className="text-xs text-muted">vkUSDC → USDC</span>
       </div>
       <form onSubmit={onSubmit} className="space-y-2">
@@ -59,19 +59,19 @@ export function WithdrawForm() {
               min="0"
               value={shares}
               onChange={(e) => setShares(e.target.value)}
-              className="flex-1 rounded border border-border bg-background px-2 py-1 text-sm outline-none focus:border-accent"
+              className="flex-1 rounded-lg border border-border bg-background/80 px-3 py-2 text-sm outline-none focus:border-accent"
               placeholder="vkUSDC shares"
             />
             <button
               type="submit"
               disabled={submitting}
-              className="rounded border border-accent bg-accent/10 px-3 py-1 text-xs font-medium text-accent hover:bg-accent/20 disabled:opacity-60"
+              className="rounded-lg border border-accent bg-accent/15 px-4 py-2 text-xs font-medium text-accent hover:bg-accent/25 disabled:opacity-60"
             >
               {submitting ? "Withdrawing…" : "Withdraw"}
             </button>
           </div>
           {triggersTravelRule && (
-            <div className="text-xs text-warning">
+            <div className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-xs text-warning">
               Travel Rule applies to this withdrawal. Details will be sent to
               the receiving VASP.
             </div>

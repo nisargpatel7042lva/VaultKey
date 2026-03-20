@@ -1,74 +1,102 @@
 export default function AboutPage() {
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-4xl">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">About VaultKey</h1>
+        <h1 className="text-2xl font-semibold">VaultKey User Guide</h1>
         <p className="text-sm text-muted">
-          A permissioned DeFi yield vault on Solana where compliance is enforced
-          on-chain at the token transfer layer (not just in the frontend).
+          New here? Follow these steps in order to understand exactly how to use
+          VaultKey as an investor and as an admin.
         </p>
       </header>
 
       <section className="space-y-3">
-        <h2 className="font-semibold">One-line pitch</h2>
+        <h2 className="font-semibold">What this app does</h2>
         <p className="text-sm text-muted">
-          VaultKey is an institutional vault where only KYC-verified wallets can
-          deposit and receive vkUSDC shares, enforced by a Solana Token-2022
-          transfer hook.
+          VaultKey is a permissioned yield vault on Solana. Only wallets with a
+          valid KYC credential can interact with vkUSDC flows.
         </p>
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-semibold">How compliance works</h2>
-        <div className="text-sm text-muted space-y-2">
+        <h2 className="font-semibold">Step-by-step (first-time setup)</h2>
+        <div className="rounded border border-border bg-surface/40 p-4 text-sm text-muted space-y-3">
           <p>
-            <span className="font-medium text-white">1) `kyc_registry`</span>{" "}
-            Admin issues a KYC credential PDA to a wallet. Revocation sets
-            `aml_cleared = false` immediately.
+            <span className="font-medium text-white">Step 1: Open Investor page</span><br />
+            Go to <span className="font-mono text-white">Investor</span> from the left menu.
+            This is where users connect wallets and perform deposits/withdrawals.
           </p>
           <p>
-            <span className="font-medium text-white">2) `transfer_hook` (Token-2022)</span>{" "}
-            Every vkUSDC transfer is screened inside the Solana runtime.
-            Transfers fail unless the recipient provides an existing, unexpired,
-            AML-cleared credential PDA.
+            <span className="font-medium text-white">Step 2: Connect your wallet</span><br />
+            Use the wallet selector and click <span className="font-mono text-white">Connect</span>.
+            Any supported Solana wallet can be used.
           </p>
           <p>
-            <span className="font-medium text-white">3) `vault`</span>{" "}
-            Deposits mint vkUSDC shares and emit KYT events; withdrawals burn
-            shares and emit Travel Rule events for withdrawals above the demo
-            threshold.
+            <span className="font-medium text-white">Step 3: Check KYC badge</span><br />
+            The badge near the header shows your status:
+            <span className="text-green-400"> VERIFIED</span>,
+            <span className="text-red-400"> BLOCKED</span>, or
+            <span className="text-gray-300"> EXPIRED</span>.
+          </p>
+          <p>
+            <span className="font-medium text-white">Step 4: If not VERIFIED, ask admin to issue KYC</span><br />
+            Admin must issue a KYC credential before you can use vault actions.
+          </p>
+          <p>
+            <span className="font-medium text-white">Step 5: Deposit USDC</span><br />
+            Enter amount in the Deposit card and submit. This mints vault shares
+            (vkUSDC) and generates compliance events.
+          </p>
+          <p>
+            <span className="font-medium text-white">Step 6: Withdraw vkUSDC</span><br />
+            Enter shares in the Withdraw card. For larger withdrawals, a Travel
+            Rule notice appears before confirmation.
+          </p>
+          <p>
+            <span className="font-medium text-white">Step 7: Review your activity</span><br />
+            Check the transaction history table at the bottom of Investor page.
           </p>
         </div>
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-semibold">MVP demo moments</h2>
-        <div className="text-sm text-muted space-y-2">
+        <h2 className="font-semibold">Admin flow (monitoring + compliance)</h2>
+        <div className="rounded border border-border bg-surface/40 p-4 text-sm text-muted space-y-3">
           <p>
-            <span className="font-medium text-white">Scene 1 — The block</span>
-            : try sending vkUSDC shares to a non-KYC wallet. The transaction
-            fails on-chain.
+            <span className="font-medium text-white">Step 1: Open Admin page</span><br />
+            Go to <span className="font-mono text-white">Admin</span> from sidebar.
           </p>
           <p>
-            <span className="font-medium text-white">Scene 2 — Deposit flow</span>
-            : a verified investor deposits USDC, receives vkUSDC shares, and a
-            KYT event appears in real time.
+            <span className="font-medium text-white">Step 2: Review vault metrics</span><br />
+            Confirm TVL, investor count, and blocked transfer attempts.
           </p>
           <p>
-            <span className="font-medium text-white">Scene 3 — Travel Rule trigger</span>
-            : withdraw a large amount; the backend forwards Travel Rule data to
-            a mock VASP endpoint and ACKs it.
+            <span className="font-medium text-white">Step 3: Manage whitelist</span><br />
+            Use KYC issuance/revocation actions to control who can participate.
+          </p>
+          <p>
+            <span className="font-medium text-white">Step 4: Watch compliance feed</span><br />
+            KYT events stream in real time with LOW/MEDIUM/HIGH risk badges.
+          </p>
+          <p>
+            <span className="font-medium text-white">Step 5: Watch Travel Rule log</span><br />
+            Confirm high-value withdrawals and VASP ACK references.
           </p>
         </div>
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-semibold">Devnet notes</h2>
-        <p className="text-sm text-muted">
-          This app is configured for devnet via <span className="font-mono">.env.local</span>.
-          Make sure the program IDs (KYC registry, transfer hook, vault) are set
-          correctly before running deposits/withdrawals.
-        </p>
+        <h2 className="font-semibold">Important notes</h2>
+        <ul className="list-disc pl-5 text-sm text-muted space-y-1">
+          <li>VaultKey is currently configured for devnet, not mainnet.</li>
+          <li>
+            Program IDs and mint addresses in <span className="font-mono text-white">.env.local</span>{" "}
+            must be real base58 values.
+          </li>
+          <li>
+            If a wallet is not KYC-verified, vault operations and transfer-hook
+            protected flows will be blocked.
+          </li>
+        </ul>
       </section>
     </div>
   );

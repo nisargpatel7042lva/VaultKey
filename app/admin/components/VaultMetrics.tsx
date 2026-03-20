@@ -42,7 +42,7 @@ export function VaultMetrics() {
   }, []);
 
   return (
-    <section className="grid grid-cols-4 gap-4 rounded border border-border bg-surface px-4 py-3 text-sm">
+    <section className="grid grid-cols-2 gap-4 rounded-2xl border border-border bg-surface px-5 py-4 text-sm xl:grid-cols-4">
       <Metric label="TVL" value={`${tvl.toLocaleString()} USDC`} />
       <Metric label="Verified investors" value={verified.toString()} />
       <Metric
@@ -59,7 +59,7 @@ export function VaultMetrics() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div>
+    <div className="rounded-xl border border-border/50 bg-background/40 p-3">
       <div className="text-xs text-muted">{label}</div>
       <div className="text-lg font-semibold">{value}</div>
     </div>

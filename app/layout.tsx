@@ -15,8 +15,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <div className="min-h-screen flex">
             <aside className="w-64 bg-background/70 backdrop-blur border-r border-border/70 px-6 py-4 flex flex-col">
               <div className="mb-6">
-                <div className="text-xl font-semibold tracking-tight">
-                  VaultKey
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/vaultkey-logo.svg"
+                    alt="VaultKey logo"
+                    className="h-8 w-8"
+                  />
+                  <div className="text-xl font-semibold tracking-tight">
+                    VaultKey
+                  </div>
                 </div>
                 <div className="text-xs text-muted mt-1">
                   Institutional permissioned yield

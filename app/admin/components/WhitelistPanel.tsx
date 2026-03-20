@@ -34,25 +34,25 @@ export function WhitelistPanel() {
   };
 
   return (
-    <section className="space-y-2 rounded border border-border bg-surface px-4 py-3 text-sm">
+    <section className="space-y-3 rounded-2xl border border-border bg-surface px-5 py-4 text-sm">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm">Whitelist</h2>
+        <h2 className="font-semibold text-sm tracking-wide">Whitelist</h2>
         <button
           type="button"
-          className="rounded border border-accent bg-accent/10 px-3 py-1 text-xs font-medium text-accent hover:bg-accent/20"
+          className="rounded-lg border border-accent bg-accent/15 px-3 py-1.5 text-xs font-medium text-accent hover:bg-accent/25"
         >
           Issue new credential
         </button>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-xl border border-border/50 bg-background/30">
         <table className="min-w-full text-xs">
           <thead className="border-b border-border text-muted">
             <tr>
-              <th className="py-1 text-left font-normal">Wallet</th>
-              <th className="py-1 text-left font-normal">Tier</th>
-              <th className="py-1 text-left font-normal">Status</th>
-              <th className="py-1 text-left font-normal">Issued</th>
-              <th className="py-1 text-left font-normal">Expiry</th>
+              <th className="px-3 py-2 text-left font-normal">Wallet</th>
+              <th className="px-3 py-2 text-left font-normal">Tier</th>
+              <th className="px-3 py-2 text-left font-normal">Status</th>
+              <th className="px-3 py-2 text-left font-normal">Issued</th>
+              <th className="px-3 py-2 text-left font-normal">Expiry</th>
             </tr>
           </thead>
           <tbody>
@@ -72,11 +72,11 @@ export function WhitelistPanel() {
 
               return (
               <tr key={i} className="border-b border-border/40 last:border-0">
-                <td className="py-1 font-mono text-[11px]">
+                <td className="px-3 py-2 font-mono text-[11px]">
                   {r.wallet.slice(0, 6)}…{r.wallet.slice(-4)}
                 </td>
-                <td className="py-1 capitalize">{tierLabel}</td>
-                <td className="py-1">
+                <td className="px-3 py-2 capitalize">{tierLabel}</td>
+                <td className="px-3 py-2">
                   <span
                     className={`inline-flex items-center rounded px-2 py-0.5 border ${badgeClass(
                       status,
@@ -85,14 +85,14 @@ export function WhitelistPanel() {
                     {status}
                   </span>
                 </td>
-                <td className="py-1">{issuedDate}</td>
-                <td className="py-1">{expiryDate}</td>
+                <td className="px-3 py-2">{issuedDate}</td>
+                <td className="px-3 py-2">{expiryDate}</td>
               </tr>
             );
             })}
             {rows.length === 0 && (
               <tr>
-                <td className="py-2 text-muted" colSpan={5}>
+                <td className="px-3 py-3 text-muted" colSpan={5}>
                   No credentials found. Once the `kyc_registry` program is
                   deployed and credentials are issued, they will appear here.
                 </td>

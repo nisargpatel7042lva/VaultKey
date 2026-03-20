@@ -40,9 +40,9 @@ export function DepositForm() {
   };
 
   return (
-    <section className="space-y-2 rounded border border-border bg-surface px-4 py-3 text-sm">
+    <section className="space-y-3 rounded-2xl border border-border bg-surface px-5 py-4 text-sm shadow-[0_0_30px_rgba(167,139,250,0.10)]">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm">Deposit</h2>
+        <h2 className="font-semibold text-sm tracking-wide">Deposit</h2>
         <span className="text-xs text-muted">USDC → vkUSDC (1:1)</span>
       </div>
       <form onSubmit={onSubmit} className="space-y-2">
@@ -53,13 +53,13 @@ export function DepositForm() {
             min="0"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="flex-1 rounded border border-border bg-background px-2 py-1 text-sm outline-none focus:border-accent"
+            className="flex-1 rounded-lg border border-border bg-background/80 px-3 py-2 text-sm outline-none focus:border-accent"
             placeholder="Amount in USDC"
           />
           <button
             type="submit"
             disabled={submitting}
-            className="rounded border border-accent bg-accent/10 px-3 py-1 text-xs font-medium text-accent hover:bg-accent/20 disabled:opacity-60"
+            className="rounded-lg border border-accent bg-accent/15 px-4 py-2 text-xs font-medium text-accent hover:bg-accent/25 disabled:opacity-60"
           >
             {submitting ? "Depositing…" : "Deposit"}
           </button>

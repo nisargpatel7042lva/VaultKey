@@ -40,39 +40,39 @@ export function TransactionHistory() {
   }, [publicKey]);
 
   return (
-    <section className="space-y-2 rounded border border-border bg-surface px-4 py-3 text-sm">
+    <section className="space-y-3 rounded-2xl border border-border bg-surface px-5 py-4 text-sm">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm">Recent activity</h2>
+        <h2 className="font-semibold text-sm tracking-wide">Recent activity</h2>
         <span className="text-xs text-muted">
           Last 10 signatures (devnet)
         </span>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-xl border border-border/50 bg-background/30">
         <table className="min-w-full text-xs">
           <thead className="border-b border-border text-muted">
             <tr>
-              <th className="py-1 text-left font-normal">Time</th>
-              <th className="py-1 text-left font-normal">Type</th>
-              <th className="py-1 text-right font-normal">Amount (USDC)</th>
-              <th className="py-1 text-left font-normal">Signature</th>
+              <th className="px-3 py-2 text-left font-normal">Time</th>
+              <th className="px-3 py-2 text-left font-normal">Type</th>
+              <th className="px-3 py-2 text-right font-normal">Amount (USDC)</th>
+              <th className="px-3 py-2 text-left font-normal">Signature</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => (
               <tr key={i} className="border-b border-border/40 last:border-0">
-                <td className="py-1">{r.time}</td>
-                <td className="py-1">
+                <td className="px-3 py-2">{r.time}</td>
+                <td className="px-3 py-2">
                   Tx
                 </td>
-                <td className="py-1 text-right">
+                <td className="px-3 py-2 text-right">
                   —
                 </td>
-                <td className="py-1 text-muted">{r.sig}</td>
+                <td className="px-3 py-2 text-muted">{r.sig}</td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td className="py-2 text-muted" colSpan={4}>
+                <td className="px-3 py-3 text-muted" colSpan={4}>
                   Connect a wallet to see recent activity.
                 </td>
               </tr>

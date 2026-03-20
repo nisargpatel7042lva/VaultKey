@@ -1,0 +1,82 @@
+{
+  "address": "7X68YPL5kqbBaNETLqathZoT9BZokZh4VsGMU641yTgD",
+  "metadata": {
+    "name": "kyc_registry",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "accounts": [
+        { "name": "config", "writable": true },
+        { "name": "admin", "writable": true, "signer": true },
+        { "name": "system_program" }
+      ],
+      "args": []
+    },
+    {
+      "name": "issue_credential",
+      "discriminator": [255, 193, 171, 224, 68, 171, 194, 87],
+      "accounts": [
+        { "name": "config", "writable": true },
+        { "name": "admin", "writable": true, "signer": true },
+        { "name": "wallet" },
+        { "name": "credential", "writable": true },
+        { "name": "system_program" }
+      ],
+      "args": [
+        { "name": "tier", "type": "u8" },
+        { "name": "expiry_days", "type": "u16" }
+      ]
+    },
+    {
+      "name": "revoke_credential",
+      "discriminator": [38, 123, 95, 95, 223, 158, 169, 87],
+      "accounts": [
+        { "name": "config", "writable": true },
+        { "name": "admin", "writable": true, "signer": true },
+        { "name": "wallet" },
+        { "name": "credential", "writable": true }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "KycRegistryConfig",
+      "discriminator": [178, 152, 164, 164, 236, 133, 252, 168]
+    },
+    {
+      "name": "KycCredential",
+      "discriminator": [209, 144, 207, 176, 210, 171, 123, 253]
+    }
+  ],
+  "types": [
+    {
+      "name": "KycRegistryConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "admin", "type": "pubkey" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    },
+    {
+      "name": "KycCredential",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "wallet", "type": "pubkey" },
+          { "name": "tier", "type": "u8" },
+          { "name": "issued_at", "type": "i64" },
+          { "name": "expiry", "type": "i64" },
+          { "name": "aml_cleared", "type": "bool" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    }
+  ]
+}

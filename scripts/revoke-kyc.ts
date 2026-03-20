@@ -1,5 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
+import { createScriptProvider } from "./anchor-provider";
+import { getKycRegistryProgram } from "./kyc-registry-program";
 
 async function main() {
   const [walletStr] = process.argv.slice(2);
@@ -9,10 +11,10 @@ async function main() {
 
   const wallet = new PublicKey(walletStr);
 
-  const provider = anchor.AnchorProvider.env();
+  const provider = createScriptProvider();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.KycRegistry as anchor.Program;
+  const program = getKycRegistryProgram(provider);
 
   const configPda = PublicKey.findProgramAddressSync(
     [Buffer.from("kyc_registry_config")],

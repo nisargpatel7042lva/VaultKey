@@ -12,8 +12,8 @@
     "backend:vasp": "ts-node -P tsconfig.backend.json backend/vasp-mock.ts",
     "test": "anchor test",
     "lint": "tsc -p tsconfig.tests.json --noEmit",
-    "issue-kyc": "ts-node scripts/issue-kyc.ts",
-    "revoke-kyc": "ts-node scripts/revoke-kyc.ts"
+    "issue-kyc": "ts-node -P tsconfig.tests.json scripts/issue-kyc.ts",
+    "revoke-kyc": "ts-node -P tsconfig.tests.json scripts/revoke-kyc.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.32.1",

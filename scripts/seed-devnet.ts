@@ -1,5 +1,8 @@
 import * as anchor from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { createScriptProvider } from "./anchor-provider";
+import { getKycRegistryProgram } from "./kyc-registry-program";
+import { getTransferHookProgram } from "./transfer-hook-program";
 
 /**
  * Bucket B: devnet seeding script.
@@ -16,11 +19,11 @@ import { PublicKey, SystemProgram } from "@solana/web3.js";
  */
 
 async function main() {
-  const provider = anchor.AnchorProvider.env();
+  const provider = createScriptProvider();
   anchor.setProvider(provider);
 
-  const kycRegistry = anchor.workspace.KycRegistry as anchor.Program;
-  const transferHook = anchor.workspace.TransferHook as anchor.Program;
+  const kycRegistry = getKycRegistryProgram(provider);
+  const transferHook = getTransferHookProgram(provider);
 
   const admin = provider.wallet.publicKey;
 

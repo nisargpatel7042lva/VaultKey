@@ -1,0 +1,24 @@
+{
+  "address": "2WVrkAtvzzakYNLNNMxfEnYWmBdrAnCqPqfHhAKUXu6T",
+  "metadata": {
+    "name": "transfer_hook",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "initialize_extra_account_meta_list",
+      "discriminator": [92, 197, 174, 197, 41, 124, 19, 3],
+      "accounts": [
+        { "name": "payer", "writable": true, "signer": true },
+        { "name": "extra_account_meta_list", "writable": true },
+        { "name": "mint" },
+        { "name": "kyc_registry_program" },
+        { "name": "system_program" }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [],
+  "types": []
+}

@@ -1,20 +1,24 @@
 import * as anchor from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { createScriptProvider } from "./anchor-provider";
+import { getKycRegistryProgram } from "./kyc-registry-program";
 
 async function main() {
   const [walletStr, tierStr, daysStr] = process.argv.slice(2);
-  if (!walletStr || !tierStr) {
-    throw new Error("Usage: pnpm issue-kyc <wallet> <tier> [expiry_days]");
+  if (!walletStr) {
+    throw new Error(
+      "Usage: pnpm issue-kyc <wallet> [tier] [expiry_days]  (tier defaults to 1)",
+    );
   }
 
   const wallet = new PublicKey(walletStr);
-  const tier = Number(tierStr);
-  const expiryDays = daysStr ? Number(daysStr) : 365;
+  const tier = tierStr !== undefined ? Number(tierStr) : 1;
+  const expiryDays = daysStr !== undefined ? Number(daysStr) : 365;
 
-  const provider = anchor.AnchorProvider.env();
+  const provider = createScriptProvider();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.KycRegistry as anchor.Program;
+  const program = getKycRegistryProgram(provider);
 
   const configPda = PublicKey.findProgramAddressSync(
     [Buffer.from("kyc_registry_config")],

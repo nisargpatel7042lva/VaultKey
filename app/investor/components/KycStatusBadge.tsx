@@ -5,7 +5,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { fetchCredential, isKycValid } from "../../lib/kyc";
 import { getConnection } from "../../lib/anchor";
 
-type Status = "unknown" | "verified" | "blocked" | "expired";
+type Status = "unknown" | "pending" | "verified" | "blocked" | "expired";
 
 export function KycStatusBadge() {
   const { publicKey } = useWallet();
@@ -23,8 +23,9 @@ export function KycStatusBadge() {
       const connection = getConnection();
       const cred = await fetchCredential(connection, publicKey);
       const res = isKycValid(cred);
+      // No on-chain credential yet — not the same as AML "blocked"
       if (!cred) {
-        setStatus("blocked");
+        setStatus("pending");
         setReason(res.reason);
       } else if (!res.valid) {
         setStatus(res.reason === "Wallet AML flagged" ? "blocked" : "expired");
@@ -39,6 +40,8 @@ export function KycStatusBadge() {
   const label =
     status === "verified"
       ? "VERIFIED"
+      : status === "pending"
+      ? "PENDING"
       : status === "blocked"
       ? "BLOCKED"
       : status === "expired"
@@ -48,6 +51,8 @@ export function KycStatusBadge() {
   const color =
     status === "verified"
       ? "bg-green-500/10 text-green-400 border-green-500/50"
+      : status === "pending"
+      ? "bg-amber-500/10 text-amber-300 border-amber-500/50"
       : status === "blocked"
       ? "bg-red-500/10 text-red-400 border-red-500/50"
       : status === "expired"

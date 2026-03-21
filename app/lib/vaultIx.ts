@@ -14,7 +14,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { deriveCredentialPDA } from "./kyc";
-import { VAULT_PROGRAM_ID, getConnection } from "./anchor";
+import { USDC_MINT, VAULT_PROGRAM_ID, getConnection } from "./anchor";
 import { fetchVaultStateRaw } from "./vaultStateRaw";
 
 const DECIMALS = 6;
@@ -55,11 +55,7 @@ export async function buildDepositTxIxs(opts: {
   const amount = parseUiAmountToU64(amountUi);
   if (amount <= 0n) throw new Error("Amount must be positive");
 
-  const usdcMintStr = process.env.NEXT_PUBLIC_USDC_MINT ?? "";
-  if (!usdcMintStr) {
-    throw new Error("Missing NEXT_PUBLIC_USDC_MINT in .env.local");
-  }
-  const usdcMint = new PublicKey(usdcMintStr);
+  const usdcMint = USDC_MINT;
 
   const state = await fetchVaultStateRaw(getConnection());
   const vkUsdcMint = state.vkUsdcMint;
@@ -162,11 +158,7 @@ export async function buildWithdrawTxIxs(opts: {
   const shares = parseUiAmountToU64(sharesUi);
   if (shares <= 0n) throw new Error("Shares must be positive");
 
-  const usdcMintStr = process.env.NEXT_PUBLIC_USDC_MINT ?? "";
-  if (!usdcMintStr) {
-    throw new Error("Missing NEXT_PUBLIC_USDC_MINT in .env.local");
-  }
-  const usdcMint = new PublicKey(usdcMintStr);
+  const usdcMint = USDC_MINT;
 
   const state = await fetchVaultStateRaw(getConnection());
   const vkUsdcMint = state.vkUsdcMint;

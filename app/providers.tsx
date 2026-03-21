@@ -32,7 +32,7 @@ export function Providers({ children }: { children: ReactNode }) {
   );
   return (
     <ConnectionProvider endpoint={RPC_URL}>
-      <WalletProvider wallets={wallets} autoConnect={false}>
+      <WalletProvider wallets={wallets} autoConnect>
         {children}
       </WalletProvider>
     </ConnectionProvider>

@@ -42,6 +42,15 @@ export const VAULT_PROGRAM_ID = safePublicKey(
   "11111111111111111111111111111111",
 );
 
+/** Circle devnet USDC (SPL) — default when env is missing (e.g. stale build). */
+export const DEFAULT_DEVNET_USDC_MINT =
+  "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+
+export const USDC_MINT = safePublicKey(
+  process.env.NEXT_PUBLIC_USDC_MINT,
+  DEFAULT_DEVNET_USDC_MINT,
+);
+
 export type TypedProgram<T extends Idl> = Program<T>;
 
 export function getConnection(): Connection {

@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { Providers } from "./providers";
 
 export const metadata = {
@@ -30,24 +31,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 </div>
               </div>
               <nav className="space-y-2 text-sm">
-                <a
+                <Link
                   href="/investor"
                   className="block px-2 py-1 rounded border border-transparent hover:border-border/90 hover:bg-surface/40 transition"
                 >
                   Investor
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/admin"
                   className="block px-2 py-1 rounded border border-transparent hover:border-border/90 hover:bg-surface/40 transition"
                 >
                   Admin
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/about"
                   className="block px-2 py-1 rounded border border-transparent hover:border-border/90 hover:bg-surface/40 transition"
                 >
                   About
-                </a>
+                </Link>
               </nav>
             </aside>
             <main className="flex-1 px-8 py-6">{children}</main>

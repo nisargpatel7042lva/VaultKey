@@ -42,6 +42,13 @@ export default function AboutPage() {
             Admin must issue a KYC credential before you can use vault actions.
           </p>
           <p>
+            <span className="font-medium text-white">Step 4b (admin / devnet): Initialize the vault</span><br />
+            If you see &quot;VaultState not found&quot;, run{" "}
+            <span className="font-mono text-white">pnpm init-vault</span> once with the
+            deployer wallet (same keypair as vkUSDC mint setup). This creates on-chain
+            state and points vkUSDC mint authority at the vault PDA.
+          </p>
+          <p>
             <span className="font-medium text-white">Step 5: Deposit USDC</span><br />
             Enter amount in the Deposit card and submit. This mints vault shares
             (vkUSDC) and generates compliance events.

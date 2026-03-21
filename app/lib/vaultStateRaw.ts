@@ -45,7 +45,9 @@ export async function fetchVaultStateRaw(
   const pda = deriveVaultStatePda();
   const info = await connection.getAccountInfo(pda, "confirmed");
   if (!info?.data) {
-    throw new Error("VaultState not found (vault not initialized)");
+    throw new Error(
+      "VaultState not found (vault not initialized). From the repo root run: pnpm init-vault",
+    );
   }
   const data = Buffer.from(info.data);
 

@@ -12,8 +12,11 @@ use errors::VaultError;
 use events::{KytEvent, TravelRuleEvent};
 use state::VaultState;
 
-// Placeholder. Anchor will overwrite this on `anchor keys sync` / deploy.
-declare_id!("11111111111111111111111111111111");
+// Program id must match target/deploy/vault-keypair.json and NEXT_PUBLIC_VAULT_PROGRAM_ID.
+declare_id!("2dT35uzogYAktk4qExvF2g2GzpfjfrUs7M3r9Frm8pJ6");
+
+/// Credential PDAs are owned by the deployed `kyc_registry` program (keep in sync with UI / hook).
+pub const KYC_REGISTRY_PROGRAM_ID: Pubkey = pubkey!("7X68YPL5kqbBaNETLqathZoT9BZokZh4VsGMU641yTgD");
 
 const DECIMALS: u8 = 6;
 const TRAVEL_RULE_THRESHOLD: u64 = 3_000_000_000; // 3000 USDC with 6 decimals
@@ -46,7 +49,7 @@ pub mod vault {
         state.total_shares = 0;
         state.nav_per_share = 1_000_000;
         state.vasp_did = vasp_did;
-        state.bump = *ctx.bumps.get("vault_state").unwrap();
+        state.bump = ctx.bumps.vault_state;
 
         Ok(())
     }
@@ -276,6 +279,7 @@ pub struct DepositUsdc<'info> {
 
     pub vk_usdc_mint: InterfaceAccount<'info, Mint>,
 
+    #[account(owner = KYC_REGISTRY_PROGRAM_ID)]
     pub credential: Account<'info, KycCredential>,
 
     pub usdc_token_program: Interface<'info, TokenInterface>,
@@ -307,6 +311,7 @@ pub struct WithdrawUsdc<'info> {
 
     pub vk_usdc_mint: InterfaceAccount<'info, Mint>,
 
+    #[account(owner = KYC_REGISTRY_PROGRAM_ID)]
     pub credential: Account<'info, KycCredential>,
 
     pub usdc_token_program: Interface<'info, TokenInterface>,

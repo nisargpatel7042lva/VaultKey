@@ -1,0 +1,24 @@
+{
+  "address": "2dT35uzogYAktk4qExvF2g2GzpfjfrUs7M3r9Frm8pJ6",
+  "metadata": {
+    "name": "vault",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "initialize_vault",
+      "discriminator": [48, 191, 163, 44, 71, 129, 63, 164],
+      "accounts": [
+        { "name": "vault_state", "writable": true },
+        { "name": "admin", "writable": true, "signer": true },
+        { "name": "vk_usdc_mint" },
+        { "name": "usdc_vault" },
+        { "name": "system_program" }
+      ],
+      "args": [{ "name": "vasp_did", "type": "string" }]
+    }
+  ],
+  "accounts": [],
+  "types": []
+}

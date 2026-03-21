@@ -1,13 +1,14 @@
 [workspace]
 members = [
-  "programs/kyc_registry",
-  "programs/transfer_hook",
-  "programs/vault",
+    "programs/kyc_registry",
+    "programs/transfer_hook",
+    "programs/vault",
 ]
 resolver = "2"
 
+# Aggressive LTO + single codegen unit can confuse `cargo-build-sbf` on some
+# Solana platform-tools versions (E0152 duplicate `core` / `sized`). Keep
+# release deps normal; program crates still optimize well enough for devnet.
 [profile.release]
 overflow-checks = true
-lto = "fat"
-codegen-units = 1
 

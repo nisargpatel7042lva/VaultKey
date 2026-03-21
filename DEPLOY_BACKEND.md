@@ -45,6 +45,35 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3004
 
 You can fill the program IDs and mint after you deploy the Anchor programs to devnet.
 
+### Vault: `Unable to open program file` (no `vault.so`)
+
+`solana program deploy ... target/deploy/vault.so` only works **after** the binary exists. Build it first:
+
+```bash
+cd /path/to/VaultKey
+anchor build -p vault
+ls -la target/deploy/vault.so
+```
+
+Then deploy to **your** vault program id (must match `vault-keypair.json` and `declare_id!`):
+
+```bash
+solana program deploy target/deploy/vault.so \
+  --program-id target/deploy/vault-keypair.json \
+  -u devnet
+```
+
+If `anchor build` fails with **E0152 duplicate `core` / `sized`**, see **`docs/SBF_E0152.md`** (common with **Solana CLI 3.x** + platform-tools on WSL2). Short version:
+
+```bash
+# refresh tools, wipe SBF target, retry
+(cd programs/vault && cargo build-sbf --force-tools-install --tools-version v1.52) || true
+rm -rf target/sbpf-solana-solana programs/vault/target/sbpf-solana-solana
+anchor build -p vault --no-idl
+```
+
+If it **still** fails, install **Solana 2.0.x** for building, or build `vault.so` in CI / another machine and copy `target/deploy/vault.so` before `solana program deploy`.
+
 ---
 
 ## 3. Install dependencies

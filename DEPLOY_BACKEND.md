@@ -63,16 +63,13 @@ solana program deploy target/deploy/vault.so \
   -u devnet
 ```
 
-If `anchor build` fails with **E0152 duplicate `core` / `sized`**, see **`docs/SBF_E0152.md`** (common with **Solana CLI 3.x** + platform-tools on WSL2). Short version:
+If `anchor build -p vault` fails with **E0152 duplicate `core` / `sized`** (common on **WSL2** + **Agave 3.1.x**), use the **Docker** build (clean Linux, pinned Agave **3.0.10** inside the image):
 
 ```bash
-# refresh tools, wipe SBF target, retry
-(cd programs/vault && cargo build-sbf --force-tools-install --tools-version v1.52) || true
-rm -rf target/sbpf-solana-solana programs/vault/target/sbpf-solana-solana
-anchor build -p vault --no-idl
+pnpm run build:vault:sbf
 ```
 
-If it **still** fails, install **Solana 2.0.x** for building, or build `vault.so` in CI / another machine and copy `target/deploy/vault.so` before `solana program deploy`.
+That runs **`scripts/build-vault-sbf.sh`** → **`Dockerfile.vault-sbf`**. Details: **`docs/SBF_E0152.md`**. CI: workflow **“Build vault (SBF, Docker)”** uploads **`vault.so`** as an artifact.
 
 ---
 

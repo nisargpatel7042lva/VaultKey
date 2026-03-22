@@ -1,0 +1,13 @@
+# Keep `docker build -f Dockerfile.vault-sbf` context small (avoid multi‑GB uploads).
+.git
+.cursor
+**/node_modules
+**/.next
+**/dist
+**/build
+target
+**/.pnpm-store
+*.log
+.env
+.env.*
+!.env.example

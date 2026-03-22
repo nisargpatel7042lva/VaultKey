@@ -35,6 +35,11 @@ target/
 **/target/
 .anchor/
 **/.anchor/
+
+# Local Agave/Solana toolchain copies (e.g. old tarball script / manual install)
+.solana-build-toolchain/
+.solana-build-*/
+
 *.so
 *.dylib
 *.dll

@@ -14,7 +14,8 @@
     "lint": "tsc -p tsconfig.tests.json --noEmit",
     "issue-kyc": "ts-node -P tsconfig.tests.json scripts/issue-kyc.ts",
     "revoke-kyc": "ts-node -P tsconfig.tests.json scripts/revoke-kyc.ts",
-    "init-vault": "ts-node -P tsconfig.tests.json scripts/init-vault.ts"
+    "init-vault": "ts-node -P tsconfig.tests.json scripts/init-vault.ts",
+    "build:vault:sbf": "bash scripts/build-vault-sbf.sh"
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.32.1",

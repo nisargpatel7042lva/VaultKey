@@ -1,0 +1,33 @@
+# Build `vault.so` in a clean Ubuntu environment (avoids WSL / mixed-cache E0152).
+#
+#   docker build -f Dockerfile.vault-sbf -t vaultkey-vault-sbf .
+#   cid=$(docker create vaultkey-vault-sbf) && docker cp "$cid":/out/vault.so ./target/deploy/vault.so && docker rm "$cid"
+#
+# Or: pnpm run build:vault:sbf
+#
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl git pkg-config libudev-dev libssl-dev build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Host Rust (for `cargo install anchor-cli`)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -y --default-toolchain 1.82.0 --profile minimal
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+RUN cargo install anchor-cli --git https://github.com/coral-xyz/anchor --tag v0.32.1 --locked --force \
+    && anchor --version
+
+# Agave 3.0.x — `cargo-build-sbf` + platform-tools (newer 3.1.x can hit E0152 on some hosts)
+ARG AGAVE_VERSION=v3.0.10
+RUN curl -sSfL "https://release.anza.xyz/${AGAVE_VERSION}/install" | sh
+ENV PATH="/root/.local/share/solana/install/active_release/bin:/root/.cargo/bin:${PATH}"
+
+RUN solana --version && cargo build-sbf --version | head -1
+
+WORKDIR /workspace
+COPY . .
+
+RUN rm -rf target/sbpf-solana-solana && anchor build -p vault --no-idl
+RUN mkdir -p /out && cp target/deploy/vault.so /out/ && ls -la /out/vault.so

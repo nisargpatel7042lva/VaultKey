@@ -22,9 +22,12 @@ RUN cargo install anchor-cli --git https://github.com/coral-xyz/anchor --tag v0.
 # Agave 3.0.x — `cargo-build-sbf` + platform-tools (newer 3.1.x can hit E0152 on some hosts)
 ARG AGAVE_VERSION=v3.0.10
 RUN curl -sSfL "https://release.anza.xyz/${AGAVE_VERSION}/install" | sh
-ENV PATH="/root/.local/share/solana/install/active_release/bin:/root/.cargo/bin:${PATH}"
+# Rustup `cargo` must come *before* Agave's bundled `cargo` (older; cannot parse
+# crates like blake3 1.8.x that use `edition2024`). `cargo-build-sbf` / `solana`
+# still resolve from the Agave install directory.
+ENV PATH="/root/.cargo/bin:/root/.local/share/solana/install/active_release/bin:${PATH}"
 
-RUN solana --version && cargo build-sbf --version | head -1
+RUN solana --version && cargo --version && cargo build-sbf --version | head -1
 
 WORKDIR /workspace
 COPY . .

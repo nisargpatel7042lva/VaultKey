@@ -3,13 +3,7 @@ import { Program } from "@coral-xyz/anchor";
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import { expect } from "chai";
 
-// Bucket B: KYC pass/fail tests for the transfer hook.
-// NOTE: The runtime execution of these tests depends on a working
-// Token-2022 toolchain and real token accounts. For now we keep the
-// expectations and wiring, but mark the suite as skipped so that it
-// doesn't block `anchor test` when the environment is not ready.
-
-describe.skip("transfer_hook", () => {
+describe("transfer_hook", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
@@ -29,8 +23,7 @@ describe.skip("transfer_hook", () => {
       transferHook.programId
     )[0];
 
-  it("initializes extra account meta list pointing at kyc_registry", async () => {
-    // Ensure kyc_registry config exists (idempotent-ish for localnet runs)
+  async function ensureKycConfig(): Promise<void> {
     try {
       await (kycRegistry.account as any).kycRegistryConfig.fetch(kycConfigPda);
     } catch {
@@ -44,34 +37,44 @@ describe.skip("transfer_hook", () => {
         .signers([admin])
         .rpc();
     }
+  }
+
+  it("initializes extra account meta list pointing at kyc_registry", async () => {
+    await ensureKycConfig();
 
     // Dummy mint pubkey for PDA derivation – in real tests this will be an
     // actual Token-2022 mint account.
     const dummyMint = Keypair.generate().publicKey;
     const extraMetaPda = extraAccountMetaListPdaForMint(dummyMint);
 
-    await transferHook.methods
-      .initializeExtraAccountMetaList()
-      .accounts({
-        payer: admin.publicKey,
-        extraAccountMetaList: extraMetaPda,
-        mint: dummyMint,
-        kycRegistryProgram: kycRegistry.programId,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([admin])
-      .rpc();
+    // Initialize only if missing, so repeated test runs are stable.
+    const infoBefore = await provider.connection.getAccountInfo(extraMetaPda);
+    if (!infoBefore) {
+      await transferHook.methods
+        .initializeExtraAccountMetaList()
+        .accounts({
+          payer: admin.publicKey,
+          extraAccountMetaList: extraMetaPda,
+          mint: dummyMint,
+          kycRegistryProgram: kycRegistry.programId,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([admin])
+        .rpc();
+    }
+
+    const infoAfter = await provider.connection.getAccountInfo(extraMetaPda);
+    expect(infoAfter).to.not.eq(null);
   });
 
-  it("allows transfer when recipient has valid, AML-cleared credential", async () => {
+  it("issues a valid credential that the hook can use", async () => {
+    await ensureKycConfig();
     const recipient = Keypair.generate();
-
     const credentialPda = PublicKey.findProgramAddressSync(
       [Buffer.from("kyc"), recipient.publicKey.toBuffer()],
       kycRegistry.programId
     )[0];
 
-    // Issue credential
     await kycRegistry.methods
       .issueCredential(1, 30)
       .accounts({
@@ -84,37 +87,13 @@ describe.skip("transfer_hook", () => {
       .signers([admin])
       .rpc();
 
-    // TODO: once full Token-2022 test harness is wired, call the
-    // transfer_hook Execute flow here and assert success.
+    const cred = await (kycRegistry.account as any).kycCredential.fetch(credentialPda);
+    expect(cred.amlCleared).to.eq(true);
+    expect(cred.expiry.toNumber()).to.be.greaterThan(cred.issuedAt.toNumber());
   });
 
-  it("blocks transfer when recipient is not KYCed (PDA mismatch)", async () => {
-    const kycWallet = Keypair.generate();
-    const unkycedRecipient = Keypair.generate();
-
-    const kycCredentialPda = PublicKey.findProgramAddressSync(
-      [Buffer.from("kyc"), kycWallet.publicKey.toBuffer()],
-      kycRegistry.programId
-    )[0];
-
-    // Issue credential for kycWallet, but not for unkycedRecipient.
-    await kycRegistry.methods
-      .issueCredential(1, 30)
-      .accounts({
-        config: kycConfigPda,
-        admin: admin.publicKey,
-        wallet: kycWallet.publicKey,
-        credential: kycCredentialPda,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([admin])
-      .rpc();
-
-    // TODO: once full Token-2022 test harness is wired, invoke Execute
-    // with mismatched recipient + credential and expect NotKyced.
-  });
-
-  it("blocks transfer when wallet has been AML flagged", async () => {
+  it("marks a wallet as AML-flagged after revoke", async () => {
+    await ensureKycConfig();
     const wallet = Keypair.generate();
 
     const credentialPda = PublicKey.findProgramAddressSync(
@@ -147,8 +126,17 @@ describe.skip("transfer_hook", () => {
       .signers([admin])
       .rpc();
 
-    // TODO: once full Token-2022 test harness is wired, invoke Execute
-    // for an AML-flagged wallet and expect AmlFlagged.
+    const cred = await (kycRegistry.account as any).kycCredential.fetch(credentialPda);
+    expect(cred.amlCleared).to.eq(false);
+  });
+
+  it("executes transfer-hook end-to-end when token-2022 harness is enabled", async function () {
+    if (process.env.ENABLE_TOKEN2022_E2E !== "1") {
+      this.skip();
+    }
+    // This is intentionally gated behind ENABLE_TOKEN2022_E2E.
+    // A full Execute-path test requires token-2022 mint/account fixtures and
+    // transfer construction including extra accounts.
   });
 });
 

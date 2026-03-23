@@ -16,6 +16,7 @@ import {
   getTransferHook,
 } from "@solana/spl-token";
 import crypto from "crypto";
+import { loadEnvLocal } from "./anchor-provider";
 
 function isPlaceholder(v: string | undefined) {
   const s = (v ?? "").trim();
@@ -51,6 +52,9 @@ function discriminator(name: string): Buffer {
 }
 
 async function main() {
+  // Ensure ts-node scripts read project env vars like Next.js does.
+  loadEnvLocal();
+
   const rpcUrl =
     process.env.NEXT_PUBLIC_RPC_URL ?? "https://api.devnet.solana.com";
   const connection = new Connection(rpcUrl, "confirmed");

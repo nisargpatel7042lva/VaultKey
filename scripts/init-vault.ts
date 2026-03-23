@@ -89,7 +89,7 @@ async function main() {
   const usdcVaultAta = getAssociatedTokenAddressSync(
     usdcMint,
     vaultStatePda,
-    false,
+    true,
     TOKEN_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID,
   );

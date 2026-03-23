@@ -1,6 +1,8 @@
 # Keep `docker build -f Dockerfile.vault-sbf` context small (avoid multi‑GB uploads).
 .git
 .cursor
+.solana-build-toolchain/
+.solana-build-*/
 **/node_modules
 **/.next
 **/dist

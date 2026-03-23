@@ -47,6 +47,13 @@ async function main() {
 
   const program = getVaultProgram(provider);
   const vaultProgramId = program.programId;
+  const vaultProgramInfo = await connection.getAccountInfo(vaultProgramId, "confirmed");
+  if (!vaultProgramInfo) {
+    throw new Error(
+      `Vault program is not deployed on devnet: ${vaultProgramId.toBase58()}. ` +
+        "Deploy the vault program first, then run pnpm init-vault again.",
+    );
+  }
 
   const [vaultStatePda] = PublicKey.findProgramAddressSync(
     [Buffer.from("vault_state")],

@@ -12,3 +12,7 @@ resolver = "2"
 [profile.release]
 overflow-checks = true
 
+# If `cargo update` bumps `blake3` to ≥1.8, Docker / older Agave Cargo may fail to
+# parse its manifest (`edition2024`). Restore with:
+#   cargo update -p blake3 --precise 1.5.5
+

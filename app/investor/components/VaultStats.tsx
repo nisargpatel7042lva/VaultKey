@@ -55,24 +55,24 @@ export function VaultStats() {
   }, [publicKey]);
 
   return (
-    <section className="grid grid-cols-2 gap-4 rounded-2xl border border-border bg-surface px-5 py-4 text-sm">
-      <div className="rounded-xl border border-border/50 bg-background/40 p-3">
+    <section className="premium-panel grid grid-cols-2 gap-4 rounded-2xl bg-surface px-5 py-4 text-sm">
+      <div className="metric-tile rounded-xl p-3">
         <div className="text-xs text-muted">TVL</div>
         <div className="text-lg font-semibold">
           {loading ? "—" : `${tvl.toLocaleString()} USDC`}
         </div>
       </div>
-      <div className="rounded-xl border border-border/50 bg-background/40 p-3">
+      <div className="metric-tile rounded-xl p-3">
         <div className="text-xs text-muted">Current APY (mocked yield)</div>
         <div className="text-lg font-semibold">4.2%</div>
       </div>
-      <div className="rounded-xl border border-border/50 bg-background/40 p-3">
+      <div className="metric-tile rounded-xl p-3">
         <div className="text-xs text-muted">vkUSDC NAV</div>
         <div className="text-lg font-semibold">
           {loading ? "—" : nav.toFixed(4)} USDC
         </div>
       </div>
-      <div className="rounded-xl border border-border/50 bg-background/40 p-3">
+      <div className="metric-tile rounded-xl p-3">
         <div className="text-xs text-muted">Your balance</div>
         <div className="text-lg font-semibold">
           {loading

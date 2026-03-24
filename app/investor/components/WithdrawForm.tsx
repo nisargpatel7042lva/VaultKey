@@ -50,6 +50,10 @@ export function WithdrawForm() {
         <h2 className="font-semibold text-sm tracking-wide">Withdraw</h2>
         <span className="text-xs text-muted">vkUSDC → USDC</span>
       </div>
+      <p className="text-xs text-muted">
+        Enter shares to redeem USDC. Large withdrawals trigger Travel Rule
+        compliance logging.
+      </p>
       <form onSubmit={onSubmit} className="space-y-2">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
@@ -78,7 +82,7 @@ export function WithdrawForm() {
           )}
         </div>
         {message && (
-          <div className="text-xs text-muted">
+          <div className="rounded-lg border border-border/60 bg-background/40 px-3 py-2 text-xs text-muted">
             {message}
           </div>
         )}

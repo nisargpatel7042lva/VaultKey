@@ -1,0 +1,12 @@
+{
+  "project_name": "VaultKey",
+  "repo_url": "https://github.com/nisargpatel7042lva/VaultKey.git",
+  "commit_sha": "c0ba16d93bc2557eda97c37f195ffe078f34cfc0",
+  "rollup_chain_id": "solana-devnet",
+  "deployed_address": "2dT35uzogYAktk4qExvF2g2GzpfjfrUs7M3r9Frm8pJ6",
+  "vm": "wasm",
+  "native_feature": "auto-signing",
+  "core_logic_path": "programs/vault/src/lib.rs",
+  "native_feature_frontend_path": "app/providers.tsx",
+  "demo_video_url": "https://youtube.com/your-link"
+}

@@ -18,6 +18,28 @@
 
 ---
 
+## Initia Hackathon Submission
+
+- **Project Name**: VaultKey
+
+### Project Overview
+
+VaultKey is an institutional, permissioned DeFi vault on **Solana devnet** where KYC, AML, KYT, and Travel Rule are visible in the product architecture. Compliance is enforced at the **token layer** using a Token-2022 transfer hook so vault share transfers cannot be bypassed via direct contract calls. The stack is three Anchor programs (`kyc_registry`, `transfer_hook`, `vault`), a Node backend for log parsing and mock VASP, and a Next.js investor/admin UI.
+
+### Implementation Detail
+
+- **The Custom Implementation**: Custom Anchor programs for KYC credentials (PDA), transfer-hook extra-account wiring to the registry, vault deposit/withdraw with KYT and Travel Rule events, plus IDL-less client parsing where needed for devnet demos.
+- **The Native Feature**: Wallet and transaction flows use the Solana wallet adapter in `app/providers.tsx` (InterwovenKit is Initia-specific; update this repo if you port to Initia and wire the required native feature there).
+
+### How to Run Locally
+
+1. Create `.env.local` at the repo root and set `NEXT_PUBLIC_*` program IDs and mints for devnet (see project docs / bible).
+2. `pnpm install` then `pnpm dev` for the Next.js app (Investor/Admin/User Guide).
+3. Optional: `pnpm backend` for SSE compliance feed and mock Travel Rule (ports in `.env.local`).
+4. On-chain setup: see `pnpm run devnet:check`, `scripts/seed-devnet.ts`, and `pnpm init-vault` when the vault program is deployed.
+
+---
+
 ## The Problem
 
 Every DeFi vault today enforces compliance at the application layer — KYC checks live in the frontend, AML screening happens in an API, and access control is managed by a centralised server.
